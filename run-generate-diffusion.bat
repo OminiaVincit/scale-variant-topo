@@ -1,0 +1,1 @@
+python generate_diffusion_mat.py --matpath gen-networks\mat\ER-net --outpath distmat\ER-net --normflag 0 --avgflag 0 --taubg 1.0 --taued 10.0 --interval 1.0 --idxbg 1 --idxed 1
