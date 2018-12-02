@@ -1,0 +1,50 @@
+﻿  DiagramDistanceRunner_D64.cpp
+e:\qtran\topologyanalysisgit\scalevarianttopo\persistenceutils_d64\PersistenceBarcodes.h(39): warning C4251: 'NPersistenceUtils::CPersistenceBarcodes<Dtype>::m_barcodes': class 'std::vector<std::tuple<Dtype,Dtype,Dtype>,std::allocator<_Ty>>' needs to have dll-interface to be used by clients of class 'NPersistenceUtils::CPersistenceBarcodes<Dtype>'
+          with
+          [
+              _Ty=std::tuple<Dtype,Dtype,Dtype>
+          ]
+  e:\qtran\topologyanalysisgit\scalevarianttopo\diagramdistancerunner_d64\../KernelStatsUtils_D64/MultiScaleKernel.h(7): note: see declaration of 'std::vector<std::tuple<Dtype,Dtype,Dtype>,std::allocator<_Ty>>'
+          with
+          [
+              _Ty=std::tuple<Dtype,Dtype,Dtype>
+          ]
+  e:\qtran\topologyanalysisgit\scalevarianttopo\persistenceutils_d64\PersistenceBarcodes.h(42): note: see reference to class template instantiation 'NPersistenceUtils::CPersistenceBarcodes<Dtype>' being compiled
+e:\qtran\topologyanalysisgit\scalevarianttopo\persistenceutils_d64\PersistenceBarcodes.h(41): warning C4251: 'NPersistenceUtils::CPersistenceBarcodes<Dtype>::m_filesrc': class 'std::basic_string<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t>>' needs to have dll-interface to be used by clients of class 'NPersistenceUtils::CPersistenceBarcodes<Dtype>'
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xstring(2635): note: see declaration of 'std::basic_string<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t>>'
+e:\qtran\topologyanalysisgit\scalevarianttopo\persistenceutils_d64\PersistenceBarcodes.h(39): warning C4251: 'NPersistenceUtils::CPersistenceBarcodes<float>::m_barcodes': class 'std::vector<std::tuple<float,float,float>,std::allocator<_Ty>>' needs to have dll-interface to be used by clients of class 'NPersistenceUtils::CPersistenceBarcodes<float>'
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ]
+  e:\qtran\topologyanalysisgit\scalevarianttopo\diagramdistancerunner_d64\../KernelStatsUtils_D64/MultiScaleKernel.h(10): note: see declaration of 'std::vector<std::tuple<float,float,float>,std::allocator<_Ty>>'
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ]
+  DiagramDistanceRunner_D64.cpp(58): note: see reference to class template instantiation 'NPersistenceUtils::CPersistenceBarcodes<float>' being compiled
+e:\qtran\topologyanalysisgit\scalevarianttopo\persistenceutils_d64\PersistenceBarcodes.h(41): warning C4251: 'NPersistenceUtils::CPersistenceBarcodes<float>::m_filesrc': class 'std::basic_string<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t>>' needs to have dll-interface to be used by clients of class 'NPersistenceUtils::CPersistenceBarcodes<float>'
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xstring(2635): note: see declaration of 'std::basic_string<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t>>'
+E:\qtran\TopologyAnalysisGit\externals\PreBuilt\boost/tuple/detail/tuple_basic.hpp(314): warning C4244: 'initializing': conversion from 'const double' to 'float', possible loss of data
+  E:\qtran\TopologyAnalysisGit\externals\PreBuilt\boost/tuple/detail/tuple_basic.hpp(576): note: see reference to function template instantiation 'boost::tuples::cons<T0,boost::tuples::cons<T0,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>>::cons<double,boost::tuples::cons<T0,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>>(const boost::tuples::cons<double,boost::tuples::cons<T0,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>> &)' being compiled
+          with
+          [
+              T0=float
+          ]
+  E:\qtran\TopologyAnalysisGit\externals\PreBuilt\boost/tuple/detail/tuple_basic.hpp(576): note: see reference to function template instantiation 'boost::tuples::cons<T0,boost::tuples::cons<T0,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>>::cons<double,boost::tuples::cons<T0,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>>(const boost::tuples::cons<double,boost::tuples::cons<T0,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>> &)' being compiled
+          with
+          [
+              T0=float
+          ]
+  DiagramDistanceRunner_D64.cpp(486): note: see reference to function template instantiation 'boost::tuples::tuple<float,float,bool,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::tuple<T0,boost::tuples::cons<float,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>>(const boost::tuples::cons<T0,boost::tuples::cons<float,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>> &)' being compiled
+          with
+          [
+              T0=double
+          ]
+  DiagramDistanceRunner_D64.cpp(485): note: see reference to function template instantiation 'boost::tuples::tuple<float,float,bool,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::tuple<T0,boost::tuples::cons<float,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>>(const boost::tuples::cons<T0,boost::tuples::cons<float,boost::tuples::cons<bool,boost::tuples::detail::map_tuple_to_cons<boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type>::type>>> &)' being compiled
+          with
+          [
+              T0=double
+          ]
+  DiagramDistanceRunner_D64.vcxproj -> E:\qtran\TopologyAnalysisGit\ScaleVariantTopo\\Release\DiagramDistanceRunner_D64.exe
+  DiagramDistanceRunner_D64.vcxproj -> E:\qtran\TopologyAnalysisGit\ScaleVariantTopo\Release\\DiagramDistanceRunner_D64.pdb (Full PDB)

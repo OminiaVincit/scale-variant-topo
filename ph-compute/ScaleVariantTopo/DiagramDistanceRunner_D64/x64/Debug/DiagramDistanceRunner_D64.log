@@ -1,0 +1,7 @@
+﻿  stdafx.cpp
+  DiagramDistanceRunner_D64.cpp
+  DiagramDistanceRunner_D64.vcxproj -> F:\qtran\TopologyAnalysisDev\TopologyAnalysis\\Debug\DiagramDistanceRunner_D64.exe
+  DiagramDistanceRunner_D64.vcxproj -> F:\qtran\TopologyAnalysisDev\TopologyAnalysis\Debug\\DiagramDistanceRunner_D64.pdb (Full PDB)
+  SetVersion() is skipped because --version_h_file_path or --verpatch_exe_path are not set.
+  ['C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe', 'sign', '/n', 'Ziosoft, Inc', '/i', 'Go Daddy', '/d', 'ZIOSOFT Application', '/du', 'http://219.166.169.149/ZIO/', '/t', 'http://tsa.starfieldtech.com', '/v', 'F:\\qtran\\TopologyAnalysisDev\\TopologyAnalysis\\\\Debug\\DiagramDistanceRunner_D64.exe']
+  Successfully signed: sign_target_path=F:\qtran\TopologyAnalysisDev\TopologyAnalysis\\Debug\DiagramDistanceRunner_D64.exe

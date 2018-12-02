@@ -1,0 +1,129 @@
+﻿  stdafx.cpp
+  KernelFisherDA.cpp
+  KernelStatsUtils_D64.cpp
+  MultiScaleKernel.cpp
+  SliceWassersteinKernelUtil.cpp
+MultiScaleKernel.cpp(242): warning C4018: '<': signed/unsigned mismatch
+MultiScaleKernel.cpp(250): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+MultiScaleKernel.cpp(254): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+MultiScaleKernel.cpp(254): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
+MultiScaleKernel.cpp(255): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+MultiScaleKernel.cpp(143): warning C4018: '<': signed/unsigned mismatch
+  f:\qtran\topologyanalysisdev\topologyanalysis\kernelstatsutils_d64\MultiScaleKernel.h(17): note: see reference to function template instantiation 'bool NMultiScaleKernelUtils::L2DiagramMskInnerProduct<float>(float &,const std::vector<std::tuple<float,float,float>,std::allocator<_Ty>> &,const std::vector<_Ty,std::allocator<_Ty>> &,float)' being compiled
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ] (compiling source file MultiScaleKernel.cpp)
+MultiScaleKernel.cpp(154): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+MultiScaleKernel.cpp(154): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
+MultiScaleKernel.cpp(155): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+MultiScaleKernel.cpp(168): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  f:\qtran\topologyanalysisdev\topologyanalysis\kernelstatsutils_d64\MultiScaleKernel.h(30): note: see reference to function template instantiation 'bool NMultiScaleKernelUtils::L2DiagramMskInnerProduct<double>(double &,const std::vector<std::tuple<double,double,double>,std::allocator<_Ty>> &,const std::vector<_Ty,std::allocator<_Ty>> &,double,double)' being compiled
+          with
+          [
+              _Ty=std::tuple<double,double,double>
+          ] (compiling source file MultiScaleKernel.cpp)
+MultiScaleKernel.cpp(348): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  f:\qtran\topologyanalysisdev\topologyanalysis\kernelstatsutils_d64\MultiScaleKernel.h(56): note: see reference to function template instantiation 'bool NMultiScaleKernelUtils::L2DiagramMskInnerProductFGT<float>(float &,const std::vector<std::tuple<float,float,float>,std::allocator<_Ty>> &,const std::vector<_Ty,std::allocator<_Ty>> &,float)' being compiled
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ] (compiling source file MultiScaleKernel.cpp)
+MultiScaleKernel.cpp(353): warning C4018: '<': signed/unsigned mismatch
+MultiScaleKernel.cpp(379): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+MultiScaleKernel.cpp(391): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  f:\qtran\topologyanalysisdev\topologyanalysis\kernelstatsutils_d64\MultiScaleKernel.h(69): note: see reference to function template instantiation 'bool NMultiScaleKernelUtils::L2DiagramMskInnerProductFGT<double>(double &,const std::vector<std::tuple<double,double,double>,std::allocator<_Ty>> &,const std::vector<_Ty,std::allocator<_Ty>> &,double,double)' being compiled
+          with
+          [
+              _Ty=std::tuple<double,double,double>
+          ] (compiling source file MultiScaleKernel.cpp)
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\numeric(20): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data (compiling source file MultiScaleKernel.cpp)
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\numeric(30): note: see reference to function template instantiation '_Ty std::_Accumulate_unchecked<float*,_Ty,_Fn2>(_InIt,_InIt,_Ty,_Fn2 &)' being compiled
+          with
+          [
+              _Ty=double,
+              _Fn2=std::plus<float>,
+              _InIt=float *
+          ] (compiling source file MultiScaleKernel.cpp)
+  MultiScaleKernel.cpp(254): note: see reference to function template instantiation '_Ty std::accumulate<std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>,double,std::plus<float>>(_InIt,_InIt,_Ty,_Fn2)' being compiled
+          with
+          [
+              _Ty=double,
+              _InIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>,
+              _Fn2=std::plus<float>
+          ]
+SliceWassersteinKernelUtil.cpp(82): warning C4305: 'initializing': truncation from 'double' to 'float'
+  f:\qtran\topologyanalysisdev\topologyanalysis\kernelstatsutils_d64\SliceWassersteinKernelUtil.h(13): note: see reference to function template instantiation 'bool NSliceWassersteinKernelUtils::SliceCircleWassersteinDistance<float>(float &,const std::vector<std::tuple<float,float,float>,std::allocator<_Ty>> &,const std::vector<_Ty,std::allocator<_Ty>> &,std::size_t)' being compiled
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ] (compiling source file SliceWassersteinKernelUtil.cpp)
+SliceWassersteinKernelUtil.cpp(83): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+SliceWassersteinKernelUtil.cpp(97): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+SliceWassersteinKernelUtil.cpp(97): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
+SliceWassersteinKernelUtil.cpp(101): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+SliceWassersteinKernelUtil.cpp(125): warning C4305: 'initializing': truncation from 'double' to 'float'
+  f:\qtran\topologyanalysisdev\topologyanalysis\kernelstatsutils_d64\SliceWassersteinKernelUtil.h(30): note: see reference to function template instantiation 'bool NSliceWassersteinKernelUtils::SliceCircleWassersteinDistance<float>(float &,const std::vector<std::tuple<float,float,float>,std::allocator<_Ty>> &,const std::vector<_Ty,std::allocator<_Ty>> &,std::size_t,std::size_t)' being compiled
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ] (compiling source file SliceWassersteinKernelUtil.cpp)
+SliceWassersteinKernelUtil.cpp(126): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+SliceWassersteinKernelUtil.cpp(127): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+SliceWassersteinKernelUtil.cpp(147): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+SliceWassersteinKernelUtil.cpp(150): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+SliceWassersteinKernelUtil.cpp(152): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\numeric(20): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data (compiling source file SliceWassersteinKernelUtil.cpp)
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\numeric(30): note: see reference to function template instantiation '_Ty std::_Accumulate_unchecked<float*,_Ty,_Fn2>(_InIt,_InIt,_Ty,_Fn2 &)' being compiled
+          with
+          [
+              _Ty=double,
+              _Fn2=std::plus<float>,
+              _InIt=float *
+          ] (compiling source file SliceWassersteinKernelUtil.cpp)
+  SliceWassersteinKernelUtil.cpp(97): note: see reference to function template instantiation '_Ty std::accumulate<std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>,double,std::plus<Dtype>>(_InIt,_InIt,_Ty,_Fn2)' being compiled
+          with
+          [
+              _Ty=double,
+              Dtype=float,
+              _InIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>,
+              _Fn2=std::plus<float>
+          ]
+  f:\qtran\topologyanalysisdev\topologyanalysis\kernelstatsutils_d64\SliceWassersteinKernelUtil.h(13): note: see reference to function template instantiation 'bool NSliceWassersteinKernelUtils::SliceCircleWassersteinDistance<float>(float &,const std::vector<std::tuple<float,float,float>,std::allocator<_Ty>> &,const std::vector<_Ty,std::allocator<_Ty>> &,std::size_t)' being compiled
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ] (compiling source file SliceWassersteinKernelUtil.cpp)
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\tuple(164): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data (compiling source file SliceWassersteinKernelUtil.cpp)
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\tuple(520): note: see reference to function template instantiation 'std::_Tuple_val<_This>::_Tuple_val<_Ty>(_Other &&)' being compiled
+          with
+          [
+              _This=float,
+              _Ty=double,
+              _Other=double
+          ] (compiling source file SliceWassersteinKernelUtil.cpp)
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\tuple(519): note: see reference to function template instantiation 'std::_Tuple_val<_This>::_Tuple_val<_Ty>(_Other &&)' being compiled
+          with
+          [
+              _This=float,
+              _Ty=double,
+              _Other=double
+          ] (compiling source file SliceWassersteinKernelUtil.cpp)
+  SliceWassersteinKernelUtil.cpp(57): note: see reference to function template instantiation 'std::tuple<float,float,float>::tuple<double,double,float,0,0>(std::tuple<double,double,float> &&)' being compiled
+  SliceWassersteinKernelUtil.cpp(57): note: see reference to function template instantiation 'std::tuple<float,float,float>::tuple<double,double,float,0,0>(std::tuple<double,double,float> &&)' being compiled
+  SliceWassersteinKernelUtil.cpp(78): note: see reference to function template instantiation 'bool NSliceWassersteinKernelUtils::ProjectToDiagonalAndAppend<float>(std::vector<std::tuple<float,float,float>,std::allocator<_Ty>> &,std::vector<_Ty,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=std::tuple<float,float,float>
+          ]
+KernelFisherDA.cpp(34): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  KernelFisherDA.cpp(18): note: see reference to function template instantiation 'double NKernelStatsUtils::ComputeKFDR<float>(int,int,const Eigen::MatrixXf &,const double)' being compiled
+KernelFisherDA.cpp(35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+KernelFisherDA.cpp(41): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+KernelFisherDA.cpp(42): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+     Creating library x64\Debug\KernelStatsUtils_D64.lib and object x64\Debug\KernelStatsUtils_D64.exp
+  KernelStatsUtils_D64.vcxproj -> F:\qtran\TopologyAnalysisDev\TopologyAnalysis\\Debug\KernelStatsUtils_D64.dll
+  KernelStatsUtils_D64.vcxproj -> F:\qtran\TopologyAnalysisDev\TopologyAnalysis\Debug\\KernelStatsUtils_D64.pdb (Full PDB)
+  SetVersion() is skipped because --version_h_file_path or --verpatch_exe_path are not set.
+  ['C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe', 'sign', '/n', 'Ziosoft, Inc', '/i', 'Go Daddy', '/d', 'ZIOSOFT Application', '/du', 'http://219.166.169.149/ZIO/', '/t', 'http://tsa.starfieldtech.com', '/v', 'F:\\qtran\\TopologyAnalysisDev\\TopologyAnalysis\\\\Debug\\KernelStatsUtils_D64.dll']
+  Successfully signed: sign_target_path=F:\qtran\TopologyAnalysisDev\TopologyAnalysis\\Debug\KernelStatsUtils_D64.dll
