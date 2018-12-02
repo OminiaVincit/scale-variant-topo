@@ -5,3 +5,4 @@
 *.res
 *.tlog
 *.svn-base
+*.vs/*
