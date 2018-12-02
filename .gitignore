@@ -1,8 +1,16 @@
 *.obj
 *.db
 *.pch
+*.exp
 *.pdb
 *.res
 *.tlog
+*.log
 *.svn-base
-*.vs/*
+*.opendb
+*.map
+*.cache
+ph-compute/ScaleVariantTopo/KernelStatsUtils_D64/x64/Release/KernelStatsUtils_D64.lib
+ph-compute/ScaleVariantTopo/PersistenceUtils_D64/x64/Release/PersistenceUtils_D64.lib
+ph-compute/ScaleVariantTopo/RipserLib_D64/x64/Release/RipserLib_D64.lib
+ph-compute/ScaleVariantTopo/TopoUtils_D64/x64/Release/TopoUtils_D64.lib
