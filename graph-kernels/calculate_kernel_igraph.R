@@ -1,3 +1,12 @@
+#####################################################################################################
+##  File: calculate_kernel_igraph.R 
+##    calculate graph-kernels from igraph database files
+##    example: 
+##      datname <- "MUTAG"
+##      calkernel()
+##
+#####################################################################################################
+
 if(!require(graphkernels)) install.packages("graphkernels")
 if(!require(parallel)) install.packages("parallel")
 library(parallel)
@@ -13,11 +22,10 @@ N <- length(name.list)
 ### calculate kernel
 x <- seq_len(N)
 
-
 ### run kernel
 rkernel <- function(i){
   load(paste("jointddf_", datname, ".RData", sep=""))
-  kerdir <- paste("../../Datawork/NetworkDataset/", datname, "/exp_20180628/kernel/", sep="")
+  kerdir <- paste("kernel/", datname, "/", sep="")
   
   outfile <- paste(kerdir, "graph_kernel_", name.list[i], "_par_", par.list[i],".txt", sep="")
   cat(func.list[i], "\t", par.list[i], "\n")
