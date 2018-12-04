@@ -19,32 +19,35 @@ We describe source code used in our experiments to generate network data from ne
 
 ### gen-networks/gen_girvan_newman.m (Matlab)
 Generate networks from Girvan-Newman network model.
-We use the network with 128 nodes partitioned into four communities of size 32 and the average degree of 16.
-In this model, we focus on the ratio r between the probability of 
-inter-community links (p_out) and intra-community links (p_in).
-We vary r=p_out/p_in=0.01, 0.02,...,1.0 and generate 10 random realizations of the network for each value of r.
+
+    Number of nodes N = 128
+    Four communities of size 32 and the average degree of 16.
+    p_in, p_out: the probability of intra-community and inter-community links.
+    r = p_out/p_in = 0.01, 0.02,..., 1.0
 
 ### gen-networks/gen_WS.m (Matlab)
 Generate networks from Watts-Strogatz model.
-We use the network with 128 nodes and rewiring probability beta=0.00,0.01,...,1.0, 
-with 10 random realizations for each value of beta.
+
+    Number of nodes N = 128
+    Rewiring probability beta = 0.00, 0.01,..., 1.0
 
 ### gen-networks/gen_erdos_renyi.m (Matlab)
 Generate networks from Erdos-Renyi model.
-We set the number of nodes as 128, vary the pair-link probability p_link=0.020,0.021,...,0.1, 
-and generate 10 random realizations of the networks for each value of p_link.
+
+    Number of nodes N = 128
+    The pair-link probability p_link = 0.020, 0.021,..., 0.1
 
 ### gen-networks/gen_SP.m (Matlab)
 Generate networks from Sales-Pardo model.
-We generates hierarchical networks with 640 nodes and three community structures nested in one another.
-There are 64 communities of 10 nodes at the small-scale level, 
-16 communities of 40 nodes at the medium-scale level 
-and 4 communities of 160 nodes at the large-scale level.
-There are two parameters; the average degree k_bar, 
-which represents the density of the network, 
-and rho, which quantifies the separations between the three scales.
-We keep k_bar=16, vary the parameter rho=0.05,0.10,...,2.0 
-to generate 10 random realizations of the networks at each value of rho.
+
+    Number of nodes N = 640 nodes
+    Three community structures nested in one another.
+        64 communities of 10 nodes at the small-scale level, 
+        16 communities of 40 nodes at the medium-scale level,
+        4 communities of 160 nodes at the large-scale level.
+    The average degree k_bar = 16
+    The separations between the three scales: rho = 0.05, 0.10,..., 2.0 
+
 
 ## Real-world network data
 
@@ -117,13 +120,16 @@ Generate diffusion distance matrix from network adjency matrix.
 ## Compute three-dimensional persistence diagrams and persistence kernels for networks
 
 ### Compile by Visual Studio 2015
+Download ph-compute folder and launch ```ScaleVariantTopo\TopolologyAnalysis.sln```
 
-### Release/PersistenceRunner_D64.exe: calculate persistence diagrams from point clouds
+### Release/PersistenceRunner_D64.exe
+Calculate persistence diagrams from point clouds.
 
-### Release/DiffusionRunner_D64.exe: calculate persistence diagrams from diffusion distance matrix
+### Release/DiffusionRunner_D64.exe
+Calculate persistence diagrams from diffusion distance matrix.
 
-### Release/DiagramDistanceRunner_D64.exe: calculate kernel for persistence diagrams
-
+### Release/DiagramDistanceRunner_D64.exe
+Calculate kernel for persistence diagrams.
 
 
 ## Compute graph kernel for networks
