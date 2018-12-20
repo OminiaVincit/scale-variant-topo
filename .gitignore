@@ -44,3 +44,6 @@ ipch/
 *.svn-base
 *.opendb
 *.map
+graph-kernels/.RData
+graph-kernels/.Rhistory
+ph-compute/ScaleVariantTopo/.vs/TopologyAnalysis/v14/.suo
