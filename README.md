@@ -125,12 +125,77 @@ Download ph-compute folder and launch ```ScaleVariantTopo\TopolologyAnalysis.sln
 ### Release/PersistenceRunner_D64.exe
 Calculate persistence diagrams from point clouds.
 
+    Options:
+        --nthreads : number of threads using for multi-processing (-1 for all possible threads)
+        --modulus  : coefficient in the prime field Z/<p>Z to compute homology
+        --maxdim   : maximum holes dimension to compute homology
+        --thres    : maximum diameter to construct Rips complex
+        --format   : format of the input (point-cloud, lower-distance, upper-distance, distance, dipha)
+        --outdir   : directory for the output
+        --input    : input file or file contains list of input files
+        --multi    : compute single input file (0) or multi files in one input file  (1) 
+        --help     : print usage option
+
+Example: (see more at ```ph-compute\ScaleVariantTopo\run-compute-persistent.bat```)
+
+    Release\PersistentRunner_D64.exe --nthreads 16 --maxdim 1 --format point-cloud --outdir output --input data\pcl_1.txt --multi 0
+
+    Release\PersistentRunner_D64.exe --nthreads -1 --maxdim 1 --format point-cloud --outdir output --input data\pcl_list.txt --multi 1
+
 ### Release/DiffusionRunner_D64.exe
 Calculate persistence diagrams from diffusion distance matrix.
+
+    Options:
+        --nthreads : number of threads using for multi-processing (-1 for all possible threads)
+        --modulus  : coefficient in the prime field Z/<p>Z to compute homology
+        --maxdim   : maximum holes dimension to compute homology
+        --thres    : maximum diameter to construct Rips complex
+        --outdir   : directory for the output
+        --input    : input folder which contains distance matrices
+        --taumax   : compute with diffusion time up to taumax
+        --help     : print usage option
+
+See example at ```run-diffusion-persistence.bat```.
 
 ### Release/DiagramDistanceRunner_D64.exe
 Calculate kernel for persistence diagrams.
 
+Calculate kernel for 3-dimensional persistence diagrams.
+
+    Options:
+        --timehold : parameter sigmal in the kernel (=0 for optimal value)
+        --timetau  : ratio of xi vs. sigmal in the kernel
+        --left     : (left) input as list of barcodes
+        --right    : (right) input as list of barcodes
+        --dim      : dimension of holes to compute kernel
+        --skipinf  : skip holes which have infinity death-scale (default=True)
+        --infval   : replace infinity death-scales with a default value
+        --thres    : threshold to skip holes with death-birth < thres (default=0 to use all holes)
+        --output   : output filename for gram matrix
+        --posfix   : posfix for output file
+        --method   : method to compute kernel
+                     0: L2_inner_multi_sse, 1: L2_squared_distance, 
+                     2: Slice Wasserstein, 3:L2_inner_multi_nosse, 4:riemmannian_metric
+        --theta_ndirs   : number of direction in wasserstein slice distance for theta
+        --phi_ndirs     : number of direction in wasserstein slice distance for phi
+        --alltau   : use all tau (True), or single tau (False)
+        --opttau   : specify single tau (enable if alltau=0)
+                     if opttau > 0  -> calculate single-delay kernel with tau=opttau
+                     if opttau <= 0 -> calculate single-delay kernel with tau specified in barcode list file
+        --help     : print usage option
+
+Example of list of barcodes for input (see more at ```run-compute-kernel.bat```):
+
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_1.10e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_1.30e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_1.20e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_5.70e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_7.30e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_9.00e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_5.90e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_8.20e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_8.50e-01_index_1_dim_1.txt
+    demo\ph_GN_norm_0\diffusion_barcode_nodes_32_group_4_avgdeg_16_rate_5.50e-01_index_1_dim_1.txt
 
 ## Compute graph kernel for networks
 ### graph-kernels/gen_igraph.R  (R)

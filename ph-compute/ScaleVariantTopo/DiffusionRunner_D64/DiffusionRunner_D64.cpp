@@ -17,6 +17,9 @@
 #include "boost/program_options.hpp"
 #include <fstream>
 
+#include <ppl.h>
+#include <ppltasks.h>
+
 using namespace NRipserComputeUtils;
 using namespace NNpyUtils;
 
@@ -75,17 +78,17 @@ int main(int argc, char** argv)
 	using namespace boost::program_options;
 	namespace fs = boost::filesystem;
 	int nRetCode = 0;
-	options_description description("Diffusion distance");
+	options_description description("Persistence runner for diffusion distance");
 	description.add_options()
 		("debug,x", value<bool>()->default_value(false), "Print Debug Information")
-        ("norm, n", value<size_t>()->default_value(0), "Normalize the distance before calculating")
-		("nprocs,p", value<int>()->default_value(-1), "Number of processors to process")
+        ("norm", value<size_t>()->default_value(0), "Normalize the distance before calculating")
+        ("nthreads", value<int>()->default_value(-1), "Number of threads to use, -1: use all as possible")
 		("modulus,m", value<coefficient_t>()->default_value(2), "Compute homology with coefficients in the prime field Z/<p>Z")
 		("maxdim,d", value<index_t>()->default_value(0), "Compute persistent homology up to dimension <k>")
-		("threshold,th", value<value_t>()->default_value(std::numeric_limits<value_t>::max()), "Compute Rips complexes up to diameter <t>")
-		("output_dir,o", value<std::string>()->default_value("output"), "Output directory")
+		("thres", value<value_t>()->default_value(std::numeric_limits<value_t>::max()), "Compute Rips complexes up to diameter <t>")
+		("outdir,o", value<std::string>()->default_value("output"), "Output directory")
 		("input,i", value<std::string>()->default_value("network"), "Input folder")
-		("taumax,t", value<size_t>()->default_value(0), "Compute with delay time up to taumax")
+		("taumax,t", value<size_t>()->default_value(0), "Compute with diffusion time up to taumax")
 		("nbegin,b", value<size_t>()->default_value(0), "Begin index")
 		("nend,e", value<size_t>()->default_value(0), "End index")
 		("help,H", "Help: Usage DiffusionRunner_D64 [options]")
@@ -103,12 +106,11 @@ int main(int argc, char** argv)
 	size_t taumax = vm["taumax"].as<size_t>();
 	size_t nbegin = vm["nbegin"].as<size_t>();
 	size_t nend   = vm["nend"].as<size_t>();
-    auto nprocs   = vm["nprocs"].as<int>();
-    if (nprocs <= 0) {
-        std::cout << "Number of procs (= " << nprocs << ") need to be specifed as a positive integer" << std::endl;
-        std::cout << description << std::endl;
-        return nRetCode;
+    auto nthreads = vm["nthreads"].as<int>();
+    if (nthreads <= 0) {
+        nthreads = std::thread::hardware_concurrency();
     }
+    std::cout << "Number of threads (= " << nthreads << ")" << std::endl;
 
     auto input_str = vm["input"].as<std::string>();
     std::cout << "Input: " << input_str.c_str() << std::endl;
@@ -119,7 +121,7 @@ int main(int argc, char** argv)
 	OutputPrmPtr output_prm = prm->output_prm;
 
 	auto maxdim = vm["maxdim"].as<index_t>();
-	auto out_dir = NStringUtil::_s2w(vm["output_dir"].as<std::string>());
+	auto out_dir = NStringUtil::_s2w(vm["outdir"].as<std::string>());
     std::cout << "Output: " << NStringUtil::_w2s(out_dir) << std::endl;
 
 	rip_prm->modulus = vm["modulus"].as<coefficient_t>();
@@ -128,7 +130,7 @@ int main(int argc, char** argv)
         return false;
     }
 	rip_prm->dim_max = maxdim;
-	rip_prm->threshold = vm["threshold"].as<value_t>();
+	rip_prm->threshold = vm["thres"].as<value_t>();
 
 	output_prm->write_mode = INOUT_MODE::INNER_MODE;
 	output_prm->out_dir = out_dir;
@@ -209,7 +211,7 @@ int main(int argc, char** argv)
 			diffusion_barcodes.push_back(std::make_pair(n, prm_f));
 		}
 		if (!prm_vec.empty()) {
-			ComputeRipPHMultiFiles(nprocs, prm_vec);
+			ComputeRipPHMultiFiles(nthreads, prm_vec);
 		}
 		std::wstring basename = p.stem().c_str();
 		WriteDiffusionBarcodesToFile(diffusion_barcodes, out_dir, maxdim, basename);
