@@ -30,9 +30,6 @@
     <ClCompile Include="StringUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NpyUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TopoUtils_D64.h">
@@ -57,9 +54,6 @@
       <Filter>SysUtil</Filter>
     </ClInclude>
     <ClInclude Include="StringUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NpyUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

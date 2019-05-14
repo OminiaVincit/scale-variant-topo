@@ -21,6 +21,9 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NpyUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DiffusionRunner_D64.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx_project.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NpyUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

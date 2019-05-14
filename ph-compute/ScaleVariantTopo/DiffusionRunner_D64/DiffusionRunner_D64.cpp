@@ -6,7 +6,7 @@
 
 #include "stdafx.h"
 #include "DiffusionRunner_D64.h"
-#include "../TopoUtils_D64/NpyUtils.h"
+#include "NpyUtils.h"
 #include "../TopoUtils_D64/StringUtils.h"
 #include "../RipserLib_D64/RipserComputeUtils.h"
 
