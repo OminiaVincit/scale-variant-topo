@@ -89,7 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DiffusionRunner_D64.cpp" />
-    <ClCompile Include="NpyUtils.cpp" />
+    <ClCompile Include="NpMatUtils.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -97,7 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DiffusionRunner_D64.h" />
-    <ClInclude Include="NpyUtils.h" />
+    <ClInclude Include="NpMatUtils.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="stdafx_project.h" />

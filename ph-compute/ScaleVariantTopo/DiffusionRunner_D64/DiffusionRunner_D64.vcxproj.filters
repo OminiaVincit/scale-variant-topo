@@ -21,7 +21,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NpyUtils.cpp">
+    <ClCompile Include="NpMatUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,7 +38,7 @@
     <ClInclude Include="stdafx_project.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NpyUtils.h">
+    <ClInclude Include="NpMatUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

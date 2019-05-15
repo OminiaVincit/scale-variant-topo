@@ -6,7 +6,7 @@
 
 #include "stdafx.h"
 #include "DiffusionRunner_D64.h"
-#include "NpyUtils.h"
+#include "NpMatUtils.h"
 #include "../TopoUtils_D64/StringUtils.h"
 #include "../RipserLib_D64/RipserComputeUtils.h"
 
@@ -21,7 +21,7 @@
 #include <ppltasks.h>
 
 using namespace NRipserComputeUtils;
-using namespace NNpyUtils;
+using namespace NNpMatUtils;
 
 std::vector<std::wstring> ReadMultiLinesFromFile(const std::wstring& filepath) {
 	std::vector<std::wstring> rstr;
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 		NpyArray narr;
         const std::string pathname = NStringUtil::_w2s(p.c_str());
         //std::cout << "Process file: " << pathname << std::endl;
-        if (false == NNpyUtils::NpyLoad(pathname, narr)) {
+        if (false == NNpMatUtils::NpyLoad(pathname, narr)) {
             std::cout << "Error: loading npy file" << std::endl;
             return false;
         }

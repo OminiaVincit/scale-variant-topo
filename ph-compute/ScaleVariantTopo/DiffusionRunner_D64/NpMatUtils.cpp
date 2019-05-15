@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "NpyUtils.h"
+#include "NpMatUtils.h"
 
-namespace NNpyUtils {
+namespace NNpMatUtils {
 	template<typename T>
-	std::vector<char> NNpyUtils::CreateNpyHeader(const T* data, const std::vector<size_t> shape, const size_t ndims) {
+	std::vector<char> NNpMatUtils::CreateNpyHeader(const T* data, const std::vector<size_t> shape, const size_t ndims) {
 		std::vector<char> dict;
 		dict += "{'descr': '";
 		dict += BigEndianTest();
@@ -33,7 +33,7 @@ namespace NNpyUtils {
 		return header;
 	}
 
-	bool NNpyUtils::ParseNpyHeader(FILE* fp, size_t& word_size, std::vector<size_t>& shape, size_t& ndims, bool& fortran_order) {
+	bool NNpMatUtils::ParseNpyHeader(FILE* fp, size_t& word_size, std::vector<size_t>& shape, size_t& ndims, bool& fortran_order) {
 		char buffer[256];
 		size_t res = fread(buffer, sizeof(char), 11, fp);
         
@@ -86,7 +86,7 @@ namespace NNpyUtils {
 		return true;
 	}
 
-	bool NNpyUtils::LoadNpyFile(FILE* fp, NpyArray& arr) {
+	bool NNpMatUtils::LoadNpyFile(FILE* fp, NpyArray& arr) {
 		std::vector<size_t> shape;
 		size_t ndims, word_size;
 		bool fortran_order;
@@ -106,7 +106,7 @@ namespace NNpyUtils {
 		return true;
 	}
 
-	bool NNpyUtils::NpzLoad(std::string fname, npz_t& arrays) {
+	bool NNpMatUtils::NpzLoad(std::string fname, npz_t& arrays) {
 		FILE* fp;
 		fopen_s(&fp, fname.c_str(), "rb");
 
@@ -148,7 +148,7 @@ namespace NNpyUtils {
 		return true;
 	}
 
-	bool NNpyUtils::NpzLoad(std::string fname, std::string varname, NpyArray& array) {
+	bool NNpMatUtils::NpzLoad(std::string fname, std::string varname, NpyArray& array) {
 		FILE* fp;
 		fopen_s(&fp, fname.c_str(), "rb");
 
@@ -190,7 +190,7 @@ namespace NNpyUtils {
 		return false;
 	}
 
-    bool NNpyUtils::NpyLoad(std::string fname, NpyArray& arr) {
+    bool NNpMatUtils::NpyLoad(std::string fname, NpyArray& arr) {
         
 		FILE* fp;
 		fopen_s(&fp, fname.c_str(), "rb");
@@ -204,7 +204,7 @@ namespace NNpyUtils {
 	}
 
 	template<typename T>
-	bool NNpyUtils::NpySave(std::string fname, const T* data, const std::vector<size_t> shape, const size_t ndims, std::string mode) {
+	bool NNpMatUtils::NpySave(std::string fname, const T* data, const std::vector<size_t> shape, const size_t ndims, std::string mode) {
 		FILE* fp = NULL;
 		if (mode == "a") fopen_s(&fp, fname.c_str(), "r+b");
 		if (fp) {
@@ -252,12 +252,12 @@ namespace NNpyUtils {
 		return true;
 	}
 
-	bool NNpyUtils::NpySaveF(std::string fname, const float* data, const std::vector<size_t> shape, const size_t ndims, std::string mode) {
+	bool NNpMatUtils::NpySaveF(std::string fname, const float* data, const std::vector<size_t> shape, const size_t ndims, std::string mode) {
 		return NpySave(fname, data, shape, ndims, mode);
 	}
 
 	template<typename T>
-	std::vector<char>& NNpyUtils::operator+=(std::vector<char>& lhs, const T rhs) {
+	std::vector<char>& NNpMatUtils::operator+=(std::vector<char>& lhs, const T rhs) {
 		//write in little endian
 		for (char byte = 0; byte < sizeof(T); byte++) {
 			char val = *((char*)&rhs + byte);
@@ -267,13 +267,13 @@ namespace NNpyUtils {
 	}
 
 	template<>
-	std::vector<char>& NNpyUtils::operator+=(std::vector<char>& lhs, const std::string rhs) {
+	std::vector<char>& NNpMatUtils::operator+=(std::vector<char>& lhs, const std::string rhs) {
 		lhs.insert(lhs.end(), rhs.begin(), rhs.end());
 		return lhs;
 	}
 
 	template<>
-	std::vector<char>& NNpyUtils::operator+=(std::vector<char>& lhs, const char* rhs) {
+	std::vector<char>& NNpMatUtils::operator+=(std::vector<char>& lhs, const char* rhs) {
 		//write in little endian
 		size_t len = strlen(rhs);
 		lhs.reserve(len);

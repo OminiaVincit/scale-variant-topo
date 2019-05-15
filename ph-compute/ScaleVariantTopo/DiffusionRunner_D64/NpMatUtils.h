@@ -12,7 +12,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 
-namespace NNpyUtils {
+namespace NNpMatUtils {
 	struct NpyArray {
 		char* data;
 		std::vector<size_t> shape;
