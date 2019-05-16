@@ -8,37 +8,40 @@
 static const double THRES_ZERO = 70;
 
 template <class Dtype>
-bool ProjectToDiagonalAndAppend(std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_1,
-    std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_2) {
-    std::vector<std::tuple<Dtype, Dtype, Dtype>> proj_1to2;
+bool ProjectToDiagonalAndAppend(SHolePtrTypeVector<Dtype>& barcodes_1,
+    SHolePtrTypeVector<Dtype>& barcodes_2) {
+    SHolePtrTypeVector<Dtype> proj_1to2;
     for (auto bar : barcodes_1) {
-        auto tmp = (std::get<0>(bar) + std::get<1>(bar)) / 2.0;
-        proj_1to2.push_back(std::make_tuple(tmp, tmp, std::get<2>(bar)));
+        auto tmp = (bar->birth + bar->death) / 2.0;
+        SHolePtrType<Dtype> barptr(new SHole<Dtype>(tmp, tmp, bar->tau));
+        proj_1to2.push_back(barptr);
     }
 
     for (auto bar : barcodes_2) {
-        auto tmp = (std::get<0>(bar) + std::get<1>(bar)) / 2.0;
-        barcodes_1.push_back(std::make_tuple(tmp, tmp, std::get<2>(bar)));
+        auto tmp = (bar->birth + bar->death) / 2.0;
+        SHolePtrType<Dtype> barptr(new SHole<Dtype>(tmp, tmp, bar->tau));
+        barcodes_1.push_back(barptr);
     }
     std::copy(proj_1to2.begin(), proj_1to2.end(), std::back_inserter(barcodes_2));
     return true;
 }
 
 template <class Dtype>
-Dtype GetNorm(std::tuple<Dtype, Dtype, Dtype> bar1, std::tuple<Dtype, Dtype, Dtype>bar2, const Dtype& time) {
-    auto diff_1 = std::get<0>(bar1) - std::get<0>(bar2);
-    auto diff_2 = std::get<1>(bar1) - std::get<1>(bar2);
-    auto diff_3 = std::get<2>(bar1) - std::get<2>(bar2);
-    auto diff_square = diff_1*diff_1 + diff_2*diff_2 + diff_3*diff_3;
+Dtype GetNorm(SHolePtrType<Dtype>& bar1, SHolePtrType<Dtype>& bar2, const Dtype& time) {
+    auto diff_1 = bar1->birth - bar2->birth;
+    auto diff_2 = bar1->death - bar2->death;
+    auto diff_3 = bar1->tau   - bar2->tau;
+    auto diff_4 = bar1->extra - bar2->extra;
+    auto diff_square = diff_1*diff_1 + diff_2*diff_2 + diff_3*diff_3 + diff_4 * diff_4;
     const Dtype result = diff_square / (2.0*time);
     return result;
 }
 
-float GetNormSSE(std::tuple<float, float, float> bar1, std::tuple<float, float, float>bar2, const float& time) {
+float GetNormSSE(SHolePtrType<float>& bar1, SHolePtrType<float>& bar2, const float& time) {
     float result = (float)0.0;
     __m128 diff = _mm_sub_ps(
-        _mm_set_ps(0.0, std::get<0>(bar1), std::get<1>(bar1), std::get<2>(bar1)),
-        _mm_set_ps(0.0, std::get<0>(bar2), std::get<1>(bar2), std::get<2>(bar2))
+        _mm_set_ps(bar1->extra, bar1->tau, bar1->death, bar1->birth),
+        _mm_set_ps(bar2->extra, bar2->tau, bar2->death, bar2->birth)
     );
     diff = _mm_mul_ps(diff, diff);
     diff = _mm_hadd_ps(diff, diff);
@@ -47,11 +50,11 @@ float GetNormSSE(std::tuple<float, float, float> bar1, std::tuple<float, float, 
     return val;
 }
 template <class Dtype>
-bool RiemannGeodesicMetricSingle(Dtype& result, const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_1,
-    const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_2, Dtype time)
+bool RiemannGeodesicMetricSingle(Dtype& result, const SHolePtrTypeVector<Dtype>& barcodes_1,
+    const SHolePtrTypeVector<Dtype>& barcodes_2, Dtype time)
 {
-    std::vector<std::tuple<Dtype, Dtype, Dtype>> tbars_1 = barcodes_1;
-    std::vector<std::tuple<Dtype, Dtype, Dtype>> tbars_2 = barcodes_2;
+    auto tbars_1 = barcodes_1;
+    auto tbars_2 = barcodes_2;
 
     ProjectToDiagonalAndAppend(tbars_1, tbars_2);
     if(tbars_1.size() != tbars_2.size())
@@ -91,31 +94,34 @@ bool RiemannGeodesicMetricSingle(Dtype& result, const std::vector<std::tuple<Dty
 
 template <class Dtype>
 KernelStatsUtils_D64_API bool NRiemannianManifoldKernelUtils::RiemannGeodesicMetric(Dtype & result, 
-    const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_1, 
-    const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_2, Dtype T1, Dtype T2)
+    const SHolePtrTypeVector<Dtype>& barcodes_1,
+    const SHolePtrTypeVector<Dtype>& barcodes_2, Dtype T1, Dtype T2)
 {
     if (T1 <= 0 || T2 <= 0)
         return false;
     const Dtype rate = std::sqrt(T1 / T2);
-    std::vector<std::tuple<Dtype, Dtype, Dtype>> barvec1;
-    std::vector<std::tuple<Dtype, Dtype, Dtype>> barvec2;
+    SHolePtrTypeVector<Dtype> barvec1;
+    SHolePtrTypeVector<Dtype> barvec2;
     for (auto tmp : barcodes_1) {
-        barvec1.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+        SHolePtrType<Dtype> barptr(new SHole<Dtype>(tmp->birth, tmp->death, tmp->tau));
+        barvec1.push_back(barptr);
     }
 
     for (auto tmp : barcodes_2) {
-        barvec2.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+        SHolePtrType<Dtype> barptr(new SHole<Dtype>(tmp->birth, tmp->death, tmp->tau));
+        barvec2.push_back(barptr);
     }
     RiemannGeodesicMetricSingle(result, barvec1, barvec2, rate);
     return true;
 }
 
 
-bool RiemannGeodesicMetricSSE(float& result, const std::vector<std::tuple<float, float, float>>& barcodes_1,
-    const std::vector<std::tuple<float, float, float>>& barcodes_2, float time)
+bool RiemannGeodesicMetricSSE(float& result, 
+    const SHolePtrTypeVector<float>& barcodes_1,
+    const SHolePtrTypeVector<float>& barcodes_2, float time)
 {
-    std::vector<std::tuple<float, float, float>> tbars_1 = barcodes_1;
-    std::vector<std::tuple<float, float, float>> tbars_2 = barcodes_2;
+    auto tbars_1 = barcodes_1;
+    auto tbars_2 = barcodes_2;
 
     ProjectToDiagonalAndAppend(tbars_1, tbars_2);
     if (tbars_1.size() != tbars_2.size())
@@ -162,26 +168,30 @@ bool RiemannGeodesicMetricSSE(float& result, const std::vector<std::tuple<float,
 }
 
 bool RiemannGeodesicMetricSSE(float & result,
-    const std::vector<std::tuple<float, float, float>>& barcodes_1,
-    const std::vector<std::tuple<float, float, float>>& barcodes_2, float T1, float T2)
+    const SHolePtrTypeVector<float>& barcodes_1,
+    const SHolePtrTypeVector<float>& barcodes_2, float T1, float T2)
 {
     if (T1 <= 0 || T2 <= 0)
         return false;
     const float rate = std::sqrt(T1 / T2);
-    std::vector<std::tuple<float, float, float>> barvec1;
-    std::vector<std::tuple<float, float, float>> barvec2;
+    SHolePtrTypeVector<float> barvec1;
+    SHolePtrTypeVector<float> barvec2;
     for (auto tmp : barcodes_1) {
-        barvec1.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+        SHolePtrType<float> barptr(new SHole<float>(tmp->birth, tmp->death, rate * tmp->tau));
+        barvec1.push_back(barptr);
     }
 
     for (auto tmp : barcodes_2) {
-        barvec2.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+        SHolePtrType<float> barptr(new SHole<float>(tmp->birth, tmp->death, rate * tmp->tau));
+        barvec2.push_back(barptr);
     }
     RiemannGeodesicMetricSSE(result, barvec1, barvec2, rate);
     return true;
 }
 
-KernelStatsUtils_D64_API bool NRiemannianManifoldKernelUtils::RiemannGeodesicMetric(float & result, const std::vector<std::tuple<float, float, float>>& barcodes_1, const std::vector<std::tuple<float, float, float>>& barcodes_2, float T1, float T2)
+KernelStatsUtils_D64_API bool NRiemannianManifoldKernelUtils::RiemannGeodesicMetric(float & result, 
+    const SHolePtrTypeVector<float>& barcodes_1,
+    const SHolePtrTypeVector<float>& barcodes_2, float T1, float T2)
 {
     return NRiemannianManifoldKernelUtils::RiemannGeodesicMetric<float>(result, barcodes_1, barcodes_2, T1, T2);
     //return RiemannGeodesicMetricSSE(result, barcodes_1, barcodes_2, T1, T2);

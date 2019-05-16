@@ -46,3 +46,5 @@ ipch/
 *.map
 graph-kernels/.RData
 graph-kernels/.Rhistory
+*.bak
+*.pyc

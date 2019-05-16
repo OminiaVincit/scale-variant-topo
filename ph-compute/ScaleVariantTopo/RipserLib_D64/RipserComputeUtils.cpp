@@ -5,7 +5,7 @@
 #include "../PersistenceUtils_D64/PersistenceUtils_D64.h"
 #include "../TopoUtils_D64/FileUtils.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <ppl.h>
 #include <ppltasks.h>
@@ -137,7 +137,7 @@ namespace NRipserComputeUtils {
     }
 
     template <typename DistanceMatrix, typename ComparatorCofaces, typename Comparator>
-    void compute_pairs(CPersistenceBarcodesPtr& bar_ptr, std::vector<CDiameterIndexT>& columns_to_reduce, 
+    void compute_pairs(CPersistenceBarcodesPtr<FType>& bar_ptr, std::vector<CDiameterIndexT>& columns_to_reduce, 
         hash_map<index_t, index_t>& pivot_column_index,
         index_t dim, index_t n, value_t threshold, coefficient_t modulus,
         const std::vector<coefficient_t>& multiplicative_inverse, const DistanceMatrix& dist,
@@ -275,16 +275,16 @@ namespace NRipserComputeUtils {
         }
     }
 
-    bool WriteBarcodesToFile(CPersistenceBarcodesPtr bar_ptr, std::wstring out_dir, std::wstring basename) {
+    bool WriteBarcodesToFile(CPersistenceBarcodesPtr<FType> bar_ptr, std::wstring out_dir, std::wstring basename) {
         if(!bar_ptr)
             return false;
         if (bar_ptr->IsEmpty() == true) {
             return false;
         }
         // Make output directory if not exist
-        boost::filesystem::path outpath(out_dir);
-        if (!boost::filesystem::is_directory(outpath)) {
-            boost::filesystem::create_directory(outpath);
+        std::experimental::filesystem::path outpath(out_dir);
+        if (!std::experimental::filesystem::is_directory(outpath)) {
+            std::experimental::filesystem::create_directory(outpath);
         }
         auto outfile_name = bar_ptr->ToFile(outpath.c_str(), basename);
         return true;
@@ -307,7 +307,7 @@ namespace NRipserComputeUtils {
         if (input_prm->read_mode == INOUT_MODE::FILE_MODE) {
             // read from file
             // get basename for input file
-            boost::filesystem::path p(input_prm->input_file);
+            std::experimental::filesystem::path p(input_prm->input_file);
             p.replace_extension();
             basename = p.filename().c_str();
 
@@ -351,12 +351,12 @@ namespace NRipserComputeUtils {
             CRipsFiltrationComparator<decltype(dist)> comp(dist, 1, binomial_coeff);
             for (index_t index = binomial_coeff(n, 2); index-- > 0;) {
                 value_t diameter = comp.diameter(index);
-                if (diameter <= rip_prm->threshold) edges.push_back(std::make_pair(diameter, index));
+                if (diameter <= rip_prm->diameter_max) edges.push_back(std::make_pair(diameter, index));
             }
             std::sort(edges.rbegin(), edges.rend(), greater_diameter_or_smaller_index<CDiameterIndexT>());
 
             // Generate barcode for dim 0
-            CPersistenceBarcodesPtr bar0_ptr(new CPersistenceBarcodes<FType>());
+            CPersistenceBarcodesPtr<FType> bar0_ptr(new CPersistenceBarcodes<FType>());
 
             std::vector<index_t> vertices_of_edge(2);
             for (auto e : edges) {
@@ -378,7 +378,7 @@ namespace NRipserComputeUtils {
 
             for (index_t i = 0; i < n; ++i) {
                 if (dset.find(i) == i) {
-                    bar0_ptr->PushBar(0, std::numeric_limits<value_t>::infinity());
+                    bar0_ptr->PushBar(0, output_prm->valInf);
                 }
             }
             output_prm->AddBarcodes(bar0_ptr);
@@ -395,9 +395,9 @@ namespace NRipserComputeUtils {
 
             hash_map<index_t, index_t> pivot_column_index;
             pivot_column_index.reserve(columns_to_reduce.size());
-            CPersistenceBarcodesPtr bar_ptr(new CPersistenceBarcodes<FType>());
+            CPersistenceBarcodesPtr<FType> bar_ptr(new CPersistenceBarcodes<FType>());
             bar_ptr->SetDim(dim);
-            compute_pairs(bar_ptr, columns_to_reduce, pivot_column_index, dim, n, rip_prm->threshold, rip_prm->modulus, multiplicative_inverse, dist,
+            compute_pairs(bar_ptr, columns_to_reduce, pivot_column_index, dim, n, rip_prm->diameter_max, rip_prm->modulus, multiplicative_inverse, dist,
                 comp, comp_prev, binomial_coeff);
             
             output_prm->AddBarcodes(bar_ptr);
@@ -407,7 +407,7 @@ namespace NRipserComputeUtils {
                 WriteBarcodesToFile(bar_ptr, output_prm->out_dir, basename);
             }
             if (dim < dim_max) {
-                assemble_columns_to_reduce(columns_to_reduce, pivot_column_index, comp, dim, n, rip_prm->threshold, binomial_coeff);
+                assemble_columns_to_reduce(columns_to_reduce, pivot_column_index, comp, dim, n, rip_prm->diameter_max, binomial_coeff);
             }
         }
         return true;

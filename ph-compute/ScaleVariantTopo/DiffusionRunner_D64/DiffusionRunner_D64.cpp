@@ -65,7 +65,7 @@ bool WriteDiffusionBarcodesToFile(std::vector<std::pair<size_t, RipsComputePrmPt
 			auto bvec = output_prm->Barcodes();
 			if (bvec.size() <= dim) continue;
 			for (auto bar : bvec[dim]->barcodes()) {
-				out << std::get<0>(bar) << " " << std::get<1>(bar) << " " << tau << " " << std::endl;
+				out << bar->birth << " " << bar->death << " " << tau << " " << std::endl;
 			}
 		}
         std::cout << "Saved diffusion barcodes to file: " << NStringUtil::_w2s(outfile) << std::endl;
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
         return false;
     }
 	rip_prm->dim_max = maxdim;
-	rip_prm->threshold = vm["thres"].as<value_t>();
+	rip_prm->diameter_max = vm["thres"].as<value_t>();
 
 	output_prm->write_mode = INOUT_MODE::INNER_MODE;
 	output_prm->out_dir = out_dir;

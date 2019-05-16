@@ -8,47 +8,52 @@
 
 namespace NMultiScaleKernelUtils {
     template <class Dtype>
-    KernelStatsUtils_D64_API bool L2DiagramMskInnerProduct(Dtype& result, const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_1,
-        const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_2, Dtype time)
+    KernelStatsUtils_D64_API bool L2DiagramMskInnerProduct(Dtype& result, const SHolePtrTypeVector<Dtype>& barcodes_1,
+        const SHolePtrTypeVector<Dtype>& barcodes_2, Dtype time)
     {
         std::vector<Dtype> a;
         std::vector<Dtype> mu_1;
         std::vector<Dtype> mu_2;
         std::vector<Dtype> mu_3;
+        std::vector<Dtype> mu_4;
 
         std::vector<Dtype> b;
         std::vector<Dtype> nu_1;
         std::vector<Dtype> nu_2;
         std::vector<Dtype> nu_3;
+        std::vector<Dtype> nu_4;
 
         int64_t num_points_1 = (int64_t)barcodes_1.size();
         for (auto tmp : barcodes_1) {
 
             a.push_back(1.0);
-            mu_1.push_back(std::get<0>(tmp));
-            mu_2.push_back(std::get<1>(tmp));
-            mu_3.push_back(std::get<2>(tmp));
+            mu_1.push_back(tmp->birth);
+            mu_2.push_back(tmp->death);
+            mu_3.push_back(tmp->tau);
+            mu_4.push_back(tmp->extra);
 
             // mirrored points
             a.push_back(-1.0);
-            mu_1.push_back(std::get<1>(tmp));
-            mu_2.push_back(std::get<0>(tmp));
-            mu_3.push_back(std::get<2>(tmp));
+            mu_1.push_back(tmp->death);
+            mu_2.push_back(tmp->birth);
+            mu_3.push_back(tmp->tau);
+            mu_4.push_back(tmp->extra);
         }
 
         int64_t num_points_2 = (int64_t)barcodes_2.size();
         for (auto tmp : barcodes_2) {
-
             b.push_back(1.0);
-            nu_1.push_back(std::get<0>(tmp));
-            nu_2.push_back(std::get<1>(tmp));
-            nu_3.push_back(std::get<2>(tmp));
+            nu_1.push_back(tmp->birth);
+            nu_2.push_back(tmp->death);
+            nu_3.push_back(tmp->tau);
+            nu_4.push_back(tmp->extra);
 
             // mirrored points
             b.push_back(-1.0);
-            nu_1.push_back(std::get<1>(tmp));
-            nu_2.push_back(std::get<0>(tmp));
-            nu_3.push_back(std::get<2>(tmp));
+            nu_1.push_back(tmp->death);
+            nu_2.push_back(tmp->birth);
+            nu_3.push_back(tmp->tau);
+            nu_4.push_back(tmp->extra);
         }
 
         size_t local_end = 2 * num_points_1;
@@ -83,42 +88,42 @@ namespace NMultiScaleKernelUtils {
     }
 
 	template <class Dtype>
-	KernelStatsUtils_D64_API bool L2DiagramMskInnerProduct(Dtype& result, const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_1,
-		const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_2, Dtype T1, Dtype T2)
+	KernelStatsUtils_D64_API bool L2DiagramMskInnerProduct(Dtype& result, const SHolePtrTypeVector<Dtype>& barcodes_1,
+        const SHolePtrTypeVector<Dtype>& barcodes_2, Dtype T1, Dtype T2)
 	{
 		float rate = std::sqrt(T1 / T2);
-		std::vector<std::tuple<Dtype, Dtype, Dtype>> barvec1;
-		std::vector<std::tuple<Dtype, Dtype, Dtype>> barvec2;
+		SHolePtrTypeVector<Dtype> barvec1;
+		SHolePtrTypeVector<Dtype> barvec2;
 		for (auto tmp : barcodes_1) {
-			barvec1.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+            SHolePtrType<Dtype> barptr(new SHole<Dtype>(tmp->birth, tmp->death, tmp->tau));
+			barvec1.push_back(barptr);
 		}
 
 		for (auto tmp : barcodes_2) {
-			barvec2.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+            SHolePtrType<Dtype> barptr(new SHole<Dtype>(tmp->birth, tmp->death, tmp->tau));
+			barvec2.push_back(barptr);
 		}
 		L2DiagramMskInnerProduct(result, barvec1, barvec2, T1);
 		return true;
 	}
 
     template <class Dtype>
-    KernelStatsUtils_D64_API bool L2DiagramMskDistanceSquare(Dtype& result, const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_1,
-        const std::vector<std::tuple<Dtype, Dtype, Dtype>>& barcodes_2, Dtype time)
+    KernelStatsUtils_D64_API bool L2DiagramMskDistanceSquare(Dtype& result, const SHolePtrTypeVector<Dtype>& barcodes_1,
+        const SHolePtrTypeVector<Dtype>& barcodes_2, Dtype time)
     {
-        std::vector< std::tuple<Dtype, Dtype, Dtype> > barcodes = barcodes_1;
+        auto barcodes = barcodes_1;
         for (auto b : barcodes_2) {
-            auto birth = std::get<0>(b);
-            auto death = std::get<1>(b);
-            auto tau = std::get<2>(b);
             // reverse (birth, death) to be (death, birth)
-            barcodes.push_back(std::make_tuple(death, birth, tau));
+            SHolePtrType<Dtype> barptr(new SHole<Dtype>(b->death, b->birth, b->tau));
+            barcodes.push_back(barptr);
         }
         L2DiagramMskInnerProduct(result, barcodes, barcodes, time);
 
         return true;
     }
 
-	KernelStatsUtils_D64_API bool L2DiagramMskInnerProductSSE(float& result, const std::vector<std::tuple<float, float, float>>& barcodes_1,
-		const std::vector<std::tuple<float, float, float>>& barcodes_2, float time)
+	KernelStatsUtils_D64_API bool L2DiagramMskInnerProductSSE(float& result, const SHolePtrTypeVector<float>& barcodes_1,
+        const SHolePtrTypeVector<float>& barcodes_2, float time)
 	{
         if (time <= 0)
             return false;
@@ -133,20 +138,20 @@ namespace NMultiScaleKernelUtils {
 
 		for (auto tmp : barcodes_1) {
 			a.push_back(1.0);
-			mu.push_back(_mm_set_ps(0.0, std::get<0>(tmp), std::get<1>(tmp), std::get<2>(tmp)));
+			mu.push_back(_mm_set_ps(tmp->extra, tmp->tau, tmp->death, tmp->birth));
 
 			// mirrored points
 			a.push_back(-1.0);
-			mu.push_back(_mm_set_ps(0.0, std::get<1>(tmp), std::get<0>(tmp), std::get<2>(tmp)));
+			mu.push_back(_mm_set_ps(tmp->extra, tmp->tau, tmp->birth, tmp->death));
 		}
 
 		for (auto tmp : barcodes_2) {
 			b.push_back(1.0);
-			nu.push_back(_mm_set_ps(0.0, std::get<0>(tmp), std::get<1>(tmp), std::get<2>(tmp)));
+			nu.push_back(_mm_set_ps(tmp->extra, tmp->tau, tmp->death, tmp->birth));
 
 			// mirrored points
 			b.push_back(-1.0);
-			nu.push_back(_mm_set_ps(0.0, std::get<1>(tmp), std::get<0>(tmp), std::get<2>(tmp)));
+			nu.push_back(_mm_set_ps(tmp->extra, tmp->tau, tmp->birth, tmp->death));
 		}
 
 		float local_sum = 0.0;
@@ -174,20 +179,22 @@ namespace NMultiScaleKernelUtils {
 		return true;
 	}
     
-	KernelStatsUtils_D64_API bool L2DiagramMskInnerProductSSE(float& result, const std::vector<std::tuple<float, float, float>>& barcodes_1,
-        const std::vector<std::tuple<float, float, float>>& barcodes_2, float T1, float T2)
+	KernelStatsUtils_D64_API bool L2DiagramMskInnerProductSSE(float& result, const SHolePtrTypeVector<float>& barcodes_1,
+        const SHolePtrTypeVector<float>& barcodes_2, float T1, float T2)
     {
         if (T1 <= 0 || T2 <= 0)
             return false;
         float rate = std::sqrt(T1 / T2);
-		std::vector<std::tuple<float, float, float>> barvec1;
-		std::vector<std::tuple<float, float, float>> barvec2;
+        SHolePtrTypeVector<float> barvec1;
+        SHolePtrTypeVector<float> barvec2;
 		for (auto tmp : barcodes_1) {
-			barvec1.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+            SHolePtrType<float> barptr(new SHole<float>(tmp->birth, tmp->death, rate * tmp->tau));
+			barvec1.push_back(barptr);
 		}
 
 		for (auto tmp : barcodes_2) {
-			barvec2.push_back(std::make_tuple(std::get<0>(tmp), std::get<1>(tmp), rate * std::get<2>(tmp)));
+            SHolePtrType<float> barptr(new SHole<float>(tmp->birth, tmp->death, rate * tmp->tau));
+			barvec2.push_back(barptr);
 		}
 		L2DiagramMskInnerProductSSE(result, barvec1, barvec2, T1);
         return true;

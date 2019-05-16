@@ -8,6 +8,7 @@
 
 using namespace NRipserUtils;
 using namespace NDataUtils;
+using namespace NPersistenceUtils;
 
 namespace NRipserComputeUtils {
     enum FILEFORMAT {
@@ -257,23 +258,23 @@ namespace NRipserComputeUtils {
 
     struct RipserLib_D64_API RipsPrm {
         RipsPrm() : modulus(2), dim_max(0) {};
-        void ParamCopy(boost::shared_ptr<RipsPrm> _rp) {
+        void ParamCopy(std::shared_ptr<RipsPrm> _rp) {
             modulus = _rp->modulus;
             dim_max = _rp->dim_max;
-            threshold = _rp->threshold;
+            diameter_max = _rp->diameter_max;
         }
         coefficient_t modulus = 2;
         index_t dim_max = 0;
-        value_t threshold = std::numeric_limits<value_t>::max();
+        value_t diameter_max = std::numeric_limits<value_t>::max();
     };
-    typedef boost::shared_ptr<RipsPrm> RipsPrmPtr;
+    typedef std::shared_ptr<RipsPrm> RipsPrmPtr;
 
     struct RipserLib_D64_API InputPrm {
         InputPrm(){};
         InputPrm(size_t _dim) : dim_point(_dim) {
             pcl = CPointCloudPtr<value_t>::Type(new CPointCloud<value_t>(dim_point));
         }
-        void ParamCopy(boost::shared_ptr<InputPrm> _ip) {
+        void ParamCopy(std::shared_ptr<InputPrm> _ip) {
             read_mode = _ip->read_mode;
             format = _ip->format;
             input_file = _ip->input_file;
@@ -288,24 +289,26 @@ namespace NRipserComputeUtils {
         CPointCloudPtr<value_t>::Type pcl = CPointCloudPtr<value_t>::Type(new CPointCloud<value_t>());
         std::vector<value_t> distances;
     };
-    typedef boost::shared_ptr<InputPrm> InputPrmPtr;
+    typedef std::shared_ptr<InputPrm> InputPrmPtr;
 
     struct RipserLib_D64_API OutputPrm {
         OutputPrm(){};
         INOUT_MODE write_mode = INOUT_MODE::FILE_MODE;
         std::wstring out_dir = L"Output";
         std::wstring basename = L"basename";
+        value_t valInf = std::numeric_limits<value_t>::infinity();
 
-        std::vector<CPersistenceBarcodesPtr> Barcodes() {
+        TypeBarcodesPtrVec<FType> Barcodes() {
             return out_barcodes;
         };
-        void ParamCopy(boost::shared_ptr<OutputPrm> _op) {
+        void ParamCopy(std::shared_ptr<OutputPrm> _op) {
             write_mode = _op->write_mode;
             out_dir = _op->out_dir;
             basename = _op->basename;
+            valInf = _op->valInf;
         }
 
-        bool AddBarcodes(CPersistenceBarcodesPtr bar_ptr) {
+        bool AddBarcodes(CPersistenceBarcodesPtr<FType> bar_ptr) {
             if (!bar_ptr) return false;
             out_barcodes.push_back(bar_ptr);
             return true;
@@ -315,13 +318,13 @@ namespace NRipserComputeUtils {
             out_barcodes.clear();
         }
     private:
-        std::vector<CPersistenceBarcodesPtr> out_barcodes = std::vector<CPersistenceBarcodesPtr>();
+        TypeBarcodesPtrVec<FType> out_barcodes = TypeBarcodesPtrVec<FType>();
     };
-    typedef boost::shared_ptr<OutputPrm> OutputPrmPtr;
+    typedef std::shared_ptr<OutputPrm> OutputPrmPtr;
 
     struct RipserLib_D64_API RipsComputePrm {
         RipsComputePrm() {};
-        void ParamCopy(boost::shared_ptr<RipsComputePrm> _rcp) {
+        void ParamCopy(std::shared_ptr<RipsComputePrm> _rcp) {
             rip_prm->ParamCopy(_rcp->rip_prm);
             input_prm->ParamCopy(_rcp->input_prm);
             output_prm->ParamCopy(_rcp->output_prm);
@@ -331,7 +334,7 @@ namespace NRipserComputeUtils {
         InputPrmPtr input_prm = InputPrmPtr(new InputPrm());
         OutputPrmPtr output_prm = OutputPrmPtr(new OutputPrm());
     };
-    typedef boost::shared_ptr<RipsComputePrm> RipsComputePrmPtr;
+    typedef std::shared_ptr<RipsComputePrm> RipsComputePrmPtr;
     
     RipserLib_D64_API bool ComputeRipPH(RipsComputePrmPtr prm);
     RipserLib_D64_API bool ComputeRipPHMultiFiles(int nthreads, std::vector<RipsComputePrmPtr> prm_vec);

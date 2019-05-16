@@ -7,7 +7,7 @@
 #include "stdafx.h"
 
 #include "boost/program_options.hpp"
-#include "boost/filesystem.hpp"
+#include <filesystem>
 
 #include "../TopoUtils_D64/StringUtils.h"
 #include "../TopoUtils_D64/FileUtils.h"
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     }
 
     rip_prm->dim_max     = vm["maxdim"].as<index_t>();
-    rip_prm->threshold   = vm["thres"].as<value_t>();
+    rip_prm->diameter_max   = vm["thres"].as<value_t>();
 
     output_prm->out_dir      = NStringUtil::_s2w(vm["outdir"].as<std::string>());
     std::string file_format  = vm["format"].as<std::string>();
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
     
     auto multi = vm["multi"].as<bool>();
     auto input_file = vm["input"].as<std::string>();
-    if (!boost::filesystem::is_regular_file(input_file)) {
+    if (!std::experimental::filesystem::is_regular_file(input_file)) {
         std::cout << "Input file: \"" << input_file << "\" not found!!!" << std::endl;
         return nRetCode;
     }
