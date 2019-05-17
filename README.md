@@ -142,6 +142,11 @@ Example: (see more at ```ph-compute\ScaleVariantTopo\run-compute-persistent.bat`
 
     Release\PersistentRunner_D64.exe --nthreads -1 --maxdim 1 --format point-cloud --outdir output --input data\pcl_list.txt --multi 1
 
+Notice that this is the wrapper module for Ripser, which is also available under an MIT license and copyright to Ulrich Baeur.
+
+    Bauer, Ulrich. "Ripser: a lean C++ code for the computation of Vietoris–Rips persistence barcodes." 
+    Software available at https ://github. com/Ripser/ripser (2017).
+
 ### Release/DiffusionRunner_D64.exe
 Calculate persistence diagrams from diffusion distance matrix.
 
