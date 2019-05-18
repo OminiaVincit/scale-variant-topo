@@ -150,7 +150,7 @@ namespace NRipserComputeUtils {
         index_t dim, index_t n, value_t threshold, coefficient_t modulus,
         const std::vector<coefficient_t>& multiplicative_inverse, const DistanceMatrix& dist,
         const ComparatorCofaces& comp, const Comparator& comp_prev,
-        const CBinomialCoeffTable& binomial_coeff) {
+        const CBinomialCoeffTable& binomial_coeff, unsigned long skiptime) {
 
 #ifdef ASSEMBLE_REDUCTION_MATRIX
         CCompressedSparseMatrix<diameter_entry_t> reduction_coefficients;
@@ -161,6 +161,7 @@ namespace NRipserComputeUtils {
 #endif
 
         std::vector<diameter_entry_t> coface_entries;
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
         for (index_t i = 0; i < columns_to_reduce.size(); ++i) {
             auto column_to_reduce = columns_to_reduce[i];
@@ -193,7 +194,20 @@ namespace NRipserComputeUtils {
 #endif
 
             bool might_be_apparent_pair = (i == j);
+
+            // Add DebugStopForSlowComputation to log config file
+            if (skiptime > 0) {
+                begin = std::chrono::steady_clock::now();
+            }
+
             do {
+                if (skiptime > 0) {
+                    auto thres = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count();
+                    if (thres > skiptime) {
+                        std::cout << "Skipped computation over time = " << thres << " s, i=" << i << " per size = " << columns_to_reduce.size() << std::endl;
+                        break;
+                    }
+                }
                 const coefficient_t factor = modulus - getCoefficient(pivot);
 
 #ifdef ASSEMBLE_REDUCTION_MATRIX
@@ -302,6 +316,8 @@ namespace NRipserComputeUtils {
         RipsPrmPtr rip_prm = prm->rip_prm;
         InputPrmPtr input_prm = prm->input_prm;
         OutputPrmPtr output_prm = prm->output_prm;
+        auto skip_time = prm->skiptime;
+
         if(!rip_prm || !input_prm || !output_prm)
             return false;
         output_prm->ClearBarcodes();
@@ -406,7 +422,7 @@ namespace NRipserComputeUtils {
             CPersistenceBarcodesPtr<FType> bar_ptr(new CPersistenceBarcodes<FType>());
             bar_ptr->SetDim(dim);
             compute_pairs(bar_ptr, columns_to_reduce, pivot_column_index, dim, n, rip_prm->diameter_max, rip_prm->modulus, multiplicative_inverse, dist,
-                comp, comp_prev, binomial_coeff);
+                comp, comp_prev, binomial_coeff, skip_time);
             
             output_prm->AddBarcodes(bar_ptr);
             

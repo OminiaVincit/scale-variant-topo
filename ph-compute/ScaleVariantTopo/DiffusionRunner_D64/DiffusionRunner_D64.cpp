@@ -91,6 +91,7 @@ int main(int argc, char** argv)
 		("taumax,t", value<size_t>()->default_value(0), "Compute with diffusion time up to taumax")
 		("nbegin,b", value<size_t>()->default_value(0), "Begin index")
 		("nend,e", value<size_t>()->default_value(0), "End index")
+        ("skiptime,s", value<size_t>()->default_value(0), "Stop and continue for slow compute of Rips")
 		("help,H", "Help: Usage DiffusionRunner_D64 [options]")
 		("version,v", "v1.0")
 		;
@@ -106,6 +107,11 @@ int main(int argc, char** argv)
 	size_t taumax = vm["taumax"].as<size_t>();
 	size_t nbegin = vm["nbegin"].as<size_t>();
 	size_t nend   = vm["nend"].as<size_t>();
+    size_t skiptime = vm["skiptime"].as<size_t>();
+    if (skiptime > 0) {
+        std::cout << "Enable skiptime: " << skiptime << std::endl;
+    }
+
     auto nthreads = vm["nthreads"].as<int>();
     if (nthreads <= 0) {
         nthreads = std::thread::hardware_concurrency();
@@ -116,6 +122,7 @@ int main(int argc, char** argv)
     std::cout << "Input: " << input_str.c_str() << std::endl;
 
 	RipsComputePrmPtr prm(new RipsComputePrm());
+    prm->skiptime = skiptime;
 	RipsPrmPtr rip_prm = prm->rip_prm;
 	InputPrmPtr input_prm = prm->input_prm;
 	OutputPrmPtr output_prm = prm->output_prm;

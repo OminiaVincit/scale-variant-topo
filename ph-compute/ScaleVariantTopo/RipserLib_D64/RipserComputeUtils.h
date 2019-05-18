@@ -335,11 +335,13 @@ namespace NRipserComputeUtils {
             rip_prm->ParamCopy(_rcp->rip_prm);
             input_prm->ParamCopy(_rcp->input_prm);
             output_prm->ParamCopy(_rcp->output_prm);
+            skiptime = _rcp->skiptime;
         }
 
         RipsPrmPtr rip_prm = RipsPrmPtr(new RipsPrm());
         InputPrmPtr input_prm = InputPrmPtr(new InputPrm());
         OutputPrmPtr output_prm = OutputPrmPtr(new OutputPrm());
+        unsigned long skiptime = 0;
     };
     typedef std::shared_ptr<RipsComputePrm> RipsComputePrmPtr;
     
