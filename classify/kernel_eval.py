@@ -129,6 +129,10 @@ def load_kernel(folder, mt, exp_path, ph_name, dp, dim, kprm, normalize):
     if kermat is None:
         return None
     print('Dim=', dim, 'Kermat shape', kermat.shape)
+    for i in range(kermat.shape[0]):
+        if kermat[i, i] == 0:
+            print('Kernel ill defined i =', i)
+            kermat[i, i] = 1
     if kprm.method == PFK_KERNEL:
         kermat = kermat / float(-kprm.t)
         kermat = np.exp(kermat)
@@ -163,10 +167,13 @@ def svc_classify(X, y, train_index, test_index, mt):
         X_train, X_test = X[np.ix_(train_index, train_index)], X[np.ix_(test_index, train_index)]
     y_train, y_test = y[np.ix_(train_index)], y[np.ix_(test_index)]
 
+    #C_grid = [1e-2, 2e-2, 5e-2, 1e-1, 2e-1, 5e-1, 1e0, 2e0, 5e0, 1e1, 2e1, 5e1, 1e2]
+    C_grid = [1e-2, 1e-1, 1e0, 1e1, 1e2]
+    #C_grid = (10. ** np.arange(1,10,1) / len(y_train)).tolist()
     if mt == 'common':
-        best_clf = GridSearchCV(SVC(), cv=5, param_grid={'kernel':('linear', 'rbf'), 'C':[1e-2, 1e-1, 1e0, 1e1, 1e2]})
+        best_clf = GridSearchCV(SVC(), cv=5, param_grid={'kernel':('linear', 'rbf'), 'C': C_grid})
     else:
-        best_clf = GridSearchCV(SVC(kernel='precomputed'), cv=5, param_grid={"C": [1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]})
+        best_clf = GridSearchCV(SVC(kernel='precomputed'), cv=5, param_grid={"C": C_grid})
     best_clf.fit(X_train, y_train)
 
     train_sc = best_clf.score(X_train, y_train)
@@ -191,6 +198,7 @@ if __name__ == '__main__':
     parser.add_argument('--T2', type=float, default=1.0)
     parser.add_argument('--thres0', type=float, default=0.0)
     parser.add_argument('--thres1', type=float, default=0.0)
+    parser.add_argument('--weight', '-w', type=float, default=0.5)
     parser.add_argument('--time', type=float, default=1.0)
     parser.add_argument('--infval', type=float, default=0.0)
     parser.add_argument('--norm', type=int, default=1)
@@ -200,7 +208,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     parent_path, data_name, exp_name, ph_name = args.parentpath, args.dataname, args.expname, args.phname
-    dp, sp, norm, infval = args.dp, args.sp, args.norm, args.infval
+    dp, sp, norm, infval, weight = args.dp, args.sp, args.norm, args.infval, args.weight
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     log_path = os.path.join(dir_path, args.log)
@@ -209,10 +217,10 @@ if __name__ == '__main__':
     if os.path.exists(log_path) == False:
         os.makedirs(log_path)
 
-    log_filename = '{}_{}_{}_T1_{}_T2_{}_thres0_{}_thres1_{}_nums_{}_method_{}_norm_{}_infval_{}_t_{}.log'.format(
+    log_filename = '{}_{}_{}_T1_{}_T2_{}_thres0_{}_thres1_{}_nums_{}_method_{}_norm_{}_infval_{}_t_{}_w_{}.log'.format(
         data_name, exp_name, ph_name,
         args.T1, args.T2, args.thres0, args.thres1,
-        args.nums, args.method, args.norm, args.infval, args.time
+        args.nums, args.method, args.norm, args.infval, args.time, args.weight
     )
     log_filename = os.path.join(log_path, log_filename)
     logger = get_module_logger(__name__, log_filename)
@@ -259,10 +267,18 @@ if __name__ == '__main__':
             if kX1 is not None:
                 if kX is not None:
                     kX = kX + kX1
+                    #kX = np.multiply(kX, kX1)
                     print('Combined kernel')
                 else:
                     kX = kX1
             if kX is not None:
+                ## load vertex hist kernel
+                # vkerhist = np.loadtxt(os.path.join(exp_path, 'kernel\{}_vertexhist.txt'.format(data_name)), dtype=np.float32)
+                # vkerhist = normalize_kernel(vkerhist)
+                # ekerhist = np.loadtxt(os.path.join(exp_path, 'kernel\{}_edgehist.txt'.format(data_name)), dtype=np.float32)
+                
+                # kX = np.multiply(kX, vkerhist)
+
                 kerX[mt] = kX
                 print('Scale kernel loaded mt={}'.format(mt))
                 print('Shape = ', kX.shape)
@@ -301,10 +317,10 @@ if __name__ == '__main__':
 
             #logger.debug('n={}, mean local score: train={}, test={}'.format(n, avg_train_local, avg_test_local))
         
-            avg_test_global,  std_test_global  = np.mean(global_test[mt]),  np.std(global_test[mt])
-            avg_train_global, std_train_global = np.mean(global_train[mt]), np.std(global_train[mt])
+            avg_test_global,  std_test_global  = 100*np.mean(global_test[mt]),  100*np.std(global_test[mt])
+            avg_train_global, std_train_global = 100*np.mean(global_train[mt]), 100*np.std(global_train[mt])
 
-            logger.debug('n={}, mt={}, glocal score (mean, std): train=({},{}), test=({},{})'.format(n, mt,\
+            logger.debug('n={}, mt={}, glocal score (mean, std): train=( {}, {} ), test=( {}, {} )'.format(n, mt,\
                 avg_train_global, std_train_global,
                 avg_test_global, std_test_global))
         logger.debug('')
