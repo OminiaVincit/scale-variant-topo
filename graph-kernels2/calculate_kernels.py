@@ -113,8 +113,8 @@ if __name__ == '__main__':
     parser.add_argument('--handle', type=int, default=0)
     parser.add_argument('--batchsize', '-b', type=int, default=128)
     parser.add_argument('--label', type=int, default=0)
-    parser.add_argument('--label', type=int, default=0)
-    
+    parser.add_argument('--dataname', '-d', type=str, default='')
+    parser.add_argument('--kername', '-k', type=str, default='')
     
     args = parser.parse_args()
     print(args)
@@ -122,6 +122,8 @@ if __name__ == '__main__':
     norm, handle, b, label = args.norm, args.handle, args.batchsize, args.label
     if args.njobs > 0:
         njobs = args.njobs
+
+    dname, kname = args.dataname, args.kername
 
     lb_datalist = ['MUTAG', 'BZR', 'COX2', 'DHFR', 'ENZYMES', 'PROTEINS', 'NCI1', 'NCI109', 'DD', 'MSRC_9']
     ulb_datalist = ['IMDB-BINARY', 'IMDB-MULTI', 'REDDIT-BINARY','FRANKENSTEIN', 'COLLAB']
@@ -135,7 +137,15 @@ if __name__ == '__main__':
 
     rows = sorted(list(kernels.keys()))
 
+    if dname != '' and dname not in datalist:
+        raise ValueError('Not found specified data: {}'.format(dname))
+    
+    if kname != '' and kname not in kernels:
+        raise ValueError('Not found specified kernel: {}'.format(kname))
+
     for dataname in datalist:
+        if dname != '' and dataname != dname:
+            continue
         outpath = os.path.join(args.exppath,dataname)
         outpath = os.path.join(outpath, args.folder)
         if not os.path.isdir(outpath):
@@ -163,12 +173,14 @@ if __name__ == '__main__':
         #         save_kernel(G, gk, outpath, dataname, 'randomwalk_{}'.format(rwtype))
 
         if True:
-            for (i, kname) in enumerate(rows):
-                print(kname, end=" ")
-                gk = GraphKernel(kernel=kernels[kname], normalize=norm, n_jobs=njobs)
+            for (i, kername) in enumerate(rows):
+                if kname != '' and kername != kname:
+                    continue
+                print(kername, end=" ")
+                gk = GraphKernel(kernel=kernels[kername], normalize=norm, n_jobs=njobs)
                 print("", end=".")
                 use_handy = False
-                if 'WL' in kname and len(G) > 256:
+                if 'WL' in kername and len(G) > 256:
                     use_handy = True
-                save_kernel(G, gk, outpath, dataname, kname.replace('/', '-'), b, handle=use_handy)
+                save_kernel(G, gk, outpath, dataname, kername.replace('/', '-'), b, handle=use_handy)
                 
