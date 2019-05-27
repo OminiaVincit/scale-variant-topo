@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-from time import time
+import time
 
 from sklearn import svm
 from sklearn.model_selection import GridSearchCV
@@ -11,65 +11,128 @@ from sklearn.metrics import accuracy_score
 
 from grakel import datasets
 from grakel import GraphKernel
-from grakel.kernels import VertexHistogram, ShortestPath, WeisfeilerLehman, RandomWalkLabeled
+from grakel.kernels import VertexHistogram, ShortestPath, WeisfeilerLehman, RandomWalkLabeled, MultiscaleLaplacianFast
+
+from six import itervalues, iteritems
 
 import argparse
 
-kernels = {
+def sec_to_time(sec):
+    """Print time in a correct format."""
+    dt = list()
+    days = int(sec // 86400)
+    if days > 0:
+        sec -= 86400*days
+        dt.append(str(days) + " d")
+
+    hrs = int(sec // 3600)
+    if hrs > 0:
+        sec -= 3600*hrs
+        dt.append(str(hrs) + " h")
+
+    mins = int(sec // 60)
+    if mins > 0:
+        sec -= 60*mins
+        dt.append(str(mins) + " m")
+
+    if sec > 0:
+        dt.append(str(round(sec, 2)) + " s")
+    return " ".join(dt)
+
+lb_kernels = {
     "GraphletSampling": [{"name": "graphlet_sampling", "sampling": {"n_samples": 150}}],
     "WL-Subtree": [{"name": "weisfeiler_lehman", "niter": 5}, {"name": "subtree_wl"}],
     "WL-ShortestPath": [{"name": "weisfeiler_lehman", "niter": 5}, {"name": "shortest_path"}]
 }
 
+ulb_kernels = {
+    "ShortestPath" : [{"name": "shortest_path", "with_labels": False}],
+    "GraphletSampling": [{"name": "graphlet_sampling", "sampling": {"n_samples": 150}}],
+    "GeometricRandomWalk" : [{"name": "random_walk", "method_type": "fast", "with_labels": False, "kernel_type": "geometric"}], #ill defined, donot normalize
+    "ExponentialRandomWalk" : [{"name": "random_walk", "method_type": "fast", "with_labels": False, "kernel_type": "exponential"}],
+    # Must have node attribute "MultiScaleLaplacianFast" : [{"name": "multiscale_laplacian", "which": "fast"}],
+    "LovaszTheta" : [{"name": "lovasz_theta"}], #slow
+    #"SvmTheta" : [{"name": "svm_theta"}] #fast
+}
 #gk = WeisfeilerLehman(niter=1, normalize=True, base_kernel=VertexHistogram)
 #gk = VertexHistogram(normalize=True)
 
-def save_kernel(G, gk, outpath, dataname, kername, handle=False):
-    print('Compute kernel ', kername)
+def save_kernel(G, gk, outpath, dataname, kername, b, handle=False):
+    start = time.time()
+    print('Compute kernel {} use handle = {}'.format(kername, handle))
     n = len(G)
-    b = 188 
-    # Let's use multi-processing
-    processes = []
-
+    #TODO: Let's use multi-processing but need to handle with large memory consuming problem
+    K = np.zeros((n,n))
     if handle == True:
-        K = np.zeros((n,n))
         for i in range(0, n, b):
             ib = min(n, i+b)
             Gs = G[i:ib]
             Ks = gk.fit_transform(Gs)
             K[i:ib, i:ib] = Ks
-            Gn = G[ib:n]
-            if len(Gn) > 0:
+            for j in range(ib, n, b):
+                jb = min(n, j+b)
+                Gn = G[j:jb]
                 Kn = gk.transform(Gn)
-                K[i:ib, ib:n] = Kn.T
-                K[ib:n, i:ib] = Kn
+                K[i:ib, j:jb] = Kn.T
+                K[j:jb, i:ib] = Kn
+                elapse = sec_to_time(round(time.time()-start, 2))
+                print('i={}, j={}, b={}, {}'.format(i, j, b, elapse))
     else:
         K = gk.fit_transform(G)
-    P = gk.fit_transform(G)
-    print('K')
-    print(K)
-    print('P')
-    print(P)
-    print('K-P')
-    print(np.abs(P-K))
+    # P = gk.fit_transform(G)
+    # print('K')
+    # print(K)
+    # print('P')
+    # print(P)
+    # print('K-P')
+    # print(np.max(np.abs(P-K)))
 
     outfile = os.path.join(outpath, '{}_{}.txt'.format(dataname, kername))
-    #np.savetxt(outfile, K)
-    #print('Saved kernel ', kername, K.shape)
+    end = time.time()
+    elapse = sec_to_time(round(end-start, 2))
+    print('Calculate kernel {} in {} '.format(kername, elapse))
+    np.savetxt(outfile, K)
+    print('Saved kernel ', kername, K.shape)
+    print('')
+
+def to_one_hot(G):
+    # Index all discrete labels
+    mp = {dl: i for (i, dl) in enumerate(set(l for g in G for l in itervalues(g[1])))}
+    def make_vec(k):
+        vec = np.zeros((len(mp),), dtype=float)
+        vec[k] = 1.0
+        return vec
+    return [(g[0], {i: make_vec(mp[k]) for (i, k) in iteritems(g[1])}) for g in G]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--exppath', '-e', type=str, required=True)
     parser.add_argument('--folder', '-f', type=str, default='gkernel')
-    parser.add_argument('--njobs', '-j', type=int, default=8)
+    parser.add_argument('--njobs', '-j', type=int, default=-1)
+    parser.add_argument('--norm', '-n', type=int, default=1)
+    parser.add_argument('--handle', type=int, default=0)
+    parser.add_argument('--batchsize', '-b', type=int, default=128)
+    parser.add_argument('--label', type=int, default=0)
+    parser.add_argument('--label', type=int, default=0)
+    
+    
     args = parser.parse_args()
     print(args)
-    njobs = args.njobs
+    njobs = None
+    norm, handle, b, label = args.norm, args.handle, args.batchsize, args.label
+    if args.njobs > 0:
+        njobs = args.njobs
 
-    datalist = ['MUTAG', 'BZR', 'COX2', 'DHFR', 'ENZYMES', 'PROTEINS', 'NCI1', 'NCI109', 'DD', 'MSRC_9']
-    datalist = ['NCI1', 'NCI109']
-    datalist = ['DD']
-    datalist = ['MUTAG']
+    lb_datalist = ['MUTAG', 'BZR', 'COX2', 'DHFR', 'ENZYMES', 'PROTEINS', 'NCI1', 'NCI109', 'DD', 'MSRC_9']
+    ulb_datalist = ['IMDB-BINARY', 'IMDB-MULTI', 'REDDIT-BINARY','FRANKENSTEIN', 'COLLAB']
+
+    if label > 0:
+        datalist = lb_datalist
+        kernels = lb_kernels
+    else:
+        datalist = ulb_datalist
+        kernels = ulb_kernels
+
     rows = sorted(list(kernels.keys()))
 
     for dataname in datalist:
@@ -83,17 +146,16 @@ if __name__ == '__main__':
         print(dataname, y.shape)
         
         # Need to run each of below kernels separately
-        if False:
+        if False and label > 0:
+            gk = VertexHistogram(normalize=norm, n_jobs=njobs)
+            save_kernel(G, gk, outpath, dataname, 'VertexHist', b, handle=handle)
 
-            gk = VertexHistogram(normalize=True)
-            save_kernel(G, gk, outpath, dataname, 'VertexHist', n_jobs=None)
+            gk = ShortestPath(normalize=norm, n_jobs=njobs)
+            save_kernel(G, gk, outpath, dataname, 'ShortestPath', b, handle=handle)
 
-            gk = ShortestPath(normalize=True)
-            save_kernel(G, gk, outpath, dataname, 'ShortestPath', n_jobs=None)
-
-        if False:
-            gk = WeisfeilerLehman(niter=5, normalize=True, base_kernel=VertexHistogram, n_jobs=None)
-            save_kernel(G, gk, outpath, dataname, 'WL-VertexHist')
+        if False and label > 0:
+            gk = WeisfeilerLehman(niter=5, normalize=norm, base_kernel=VertexHistogram, n_jobs=None)
+            save_kernel(G, gk, outpath, dataname, 'WL-VertexHist', b, handle=handle)
 
         # if False:
         #     for rwtype in ['geometric', 'exponential']:
@@ -103,7 +165,10 @@ if __name__ == '__main__':
         if True:
             for (i, kname) in enumerate(rows):
                 print(kname, end=" ")
-                gk = GraphKernel(kernel=kernels[kname], normalize=False, n_jobs=None)
+                gk = GraphKernel(kernel=kernels[kname], normalize=norm, n_jobs=njobs)
                 print("", end=".")
-                save_kernel(G, gk, outpath, dataname, kname.replace('/', '-'), True)
-                break
+                use_handy = False
+                if 'WL' in kname and len(G) > 256:
+                    use_handy = True
+                save_kernel(G, gk, outpath, dataname, kname.replace('/', '-'), b, handle=use_handy)
+                
