@@ -11,13 +11,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--exppath', '-e', type=str, required=True)
     parser.add_argument('--folder', '-f', type=str, default='grakel')
+    parser.add_argument('--data', '-d', type=str, default='')
     args = parser.parse_args()
     print(args)
 
     labels_datals = ['MUTAG', 'BZR', 'COX2', 'DHFR', 'ENZYMES', 'DD', 'PROTEINS', 'NCI1', 'NCI109', 'MSRC_9']
     unlabels_datals = ['FRANKENSTEIN', 'IMDB-BINARY', 'IMDB-MULTI', 'REDDIT-BINARY', 'REDDIT-MULTI-5K', 'REDDIT-MULTI-12K']
 
-    datalist = ['MUTAG']
+    datalist = unlabels_datals
+    
     for dataname in datalist:
         outpath = os.path.join(args.exppath, '{}/{}'.format(dataname, args.folder))
 
