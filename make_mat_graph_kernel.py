@@ -142,8 +142,8 @@ if __name__ == '__main__':
             for b in B:
                 i, j = b[0], b[1]
                 if i < j :
-                    nb[i] = nb[i]/np.sum(nb[i])
-                    nb[j] = nb[j]/np.sum(nb[j])
+                    #nb[i] = nb[i]/np.sum(nb[i])
+                    #nb[j] = nb[j]/np.sum(nb[j])
                     
                     #print('Node ', i+1, nb[i])
                     #print('Node ', j+1, nb[j])
