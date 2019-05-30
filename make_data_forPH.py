@@ -16,11 +16,14 @@ if __name__ == '__main__':
     print(args)
 
     labels_datals = ['MUTAG', 'BZR', 'COX2', 'DHFR', 'ENZYMES', 'DD', 'PROTEINS', 'NCI1', 'NCI109', 'MSRC_9']
-    unlabels_datals = ['FRANKENSTEIN', 'IMDB-BINARY', 'IMDB-MULTI', 'REDDIT-BINARY', 'REDDIT-MULTI-5K', 'REDDIT-MULTI-12K']
+    unlabels_datals = ['FRANKENSTEIN', 'IMDB-BINARY', 'IMDB-MULTI', 'REDDIT-BINARY', 'REDDIT-MULTI-5K', 'REDDIT-MULTI-12K', 'COLLAB']
 
     datalist = unlabels_datals
-    
+    spdata = args.data
+
     for dataname in datalist:
+        if spdata != '' and dataname != spdata:
+            continue
         outpath = os.path.join(args.exppath, '{}/{}'.format(dataname, args.folder))
 
         if not os.path.isdir(outpath):
