@@ -40,6 +40,12 @@ from sklearn.svm             import SVC
 
 from collections import defaultdict
 
+# for multiple kernel learning
+import mklaren
+import align
+from mklaren.mkl.align import Align
+from mklaren.mkl.alignf import Alignf
+
 PARENT_PATH = r'F:\Research\ScaleVariant'
 EXP_NAME    = 'exp_20190516'
 
@@ -72,13 +78,14 @@ def get_exp_path(parent_path, data_name, exp_name):
     return exp_path
 
 class KernelParams:
-    def __init__(self, method, T1, T2, thres, infval, t):
+    def __init__(self, method, T1, T2, thres, infval, t, Tmax):
         self.method = method
         self.T1 = T1
         self.T2 = T2
         self.thres = thres
         self.infval = infval
         self.t = t # for Fisher Persistence kernel
+        self.Tmax = Tmax
 
 def normalize_kernel(kermat):
     #kermat[kermat <= 0] = 0
@@ -92,10 +99,10 @@ def normalize_kernel(kermat):
     return kermat
 
 def get_kernel_path(folder, mt, exp_path, ph_name, dim, kprm):
-    method, T1, T2, thres, infval = kprm.method, kprm.T1, kprm.T2, kprm.thres, kprm.infval
+    method, T1, T2, thres, infval, Tmax = kprm.method, kprm.T1, kprm.T2, kprm.thres, kprm.infval, kprm.Tmax
     if mt == FET_SCALE:
         kerpath = os.path.join(exp_path, '{}/{}_d_{}_method_{}_T1_{}_T2_{}_tmax_{}_thres_{}_inf_{}.txt'.format(folder, ph_name, \
-            dim, method, T1, T2, 0.0, thres, infval))
+            dim, method, T1, T2, Tmax, thres, infval))
     elif mt == FET_AVG_SCALE or mt == FET_AVG_SCALE_NORM:
         kerpath = os.path.join(exp_path, '{}/{}_method_{}_d_{}.txt'.format(folder, mt, method, dim))
     else:
@@ -184,6 +191,49 @@ def svc_classify(X, y, train_index, test_index, mt):
     # cnf_matrix = confusion_matrix(y_test, y_pred)
     return train_sc, test_sc
 
+def add_kernel(K1, K2):
+    if K1 is None:
+        return K2
+    if K2 is None:
+        return K1
+    return (K1 + K2)
+
+def multiply_kernel(K1, K2):
+    if K1 is None:
+        return K2
+    if K2 is None:
+        return K1
+    return np.multiply(K1, K2)
+
+def combine_kernel(K1, K2, alpha):
+    if K1 is None:
+        return K2
+    if K2 is None:
+        return K1
+    kX = alpha*K1 + (1.0-alpha)*K2
+    return kX
+
+def multiple_kernel_learning(y, train_index, K1, K2, label="normal"):
+    if K1 is None:
+        return K2
+    if K2 is None:
+        return K1
+    K1_train = K1[np.ix_(train_index, train_index)]
+    K2_train = K2[np.ix_(train_index, train_index)]
+    
+    y_train = y[np.ix_(train_index)]
+
+    model = Alignf(typ="convex")
+    #model = Align()
+    model.fit([K1_train, K2_train], y_train)
+    mu = model.mu
+    #combined_kernel = lambda x, y: \
+    #    mu[0] * K1(x, y) + mu[1] * K2(x, y)
+    print(label, mu)
+    #combine_kernel = mu[0] * centered_kernel(K1) + mu[1] * centered_kernel(K2)
+    combine_kernel = mu[0] * K1 + mu[1] * K2
+    return combine_kernel
+
 np.set_printoptions(precision=5)
 
 if __name__ == '__main__':
@@ -196,6 +246,8 @@ if __name__ == '__main__':
     parser.add_argument('--method', '-me', type=int, default=0)
     parser.add_argument('--T1', type=float, default=0.0)
     parser.add_argument('--T2', type=float, default=1.0)
+    parser.add_argument('--Tmax', type=float, default=0.0)
+    parser.add_argument('--combine', '-cb', type=int, default=0) # 0: add, 1: multiply, other: multiple learning
     parser.add_argument('--thres0', type=float, default=0.0)
     parser.add_argument('--thres1', type=float, default=0.0)
     parser.add_argument('--weight', '-w', type=float, default=0.5)
@@ -209,6 +261,7 @@ if __name__ == '__main__':
 
     parent_path, data_name, exp_name, ph_name = args.parentpath, args.dataname, args.expname, args.phname
     dp, sp, norm, infval, weight = args.dp, args.sp, args.norm, args.infval, args.weight
+    Tmax, cb = args.Tmax, args.combine
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     log_path = os.path.join(dir_path, args.log)
@@ -217,10 +270,10 @@ if __name__ == '__main__':
     if os.path.exists(log_path) == False:
         os.makedirs(log_path)
 
-    log_filename = '{}_{}_{}_T1_{}_T2_{}_thres0_{}_thres1_{}_nums_{}_method_{}_norm_{}_infval_{}_t_{}_w_{}.log'.format(
+    log_filename = '{}_{}_{}_T1_{}_T2_{}_Tmax_{}_thres0_{}_thres1_{}_nums_{}_method_{}_norm_{}_infval_{}_t_{}_sp_{}_dp_{}_cb_{}.log'.format(
         data_name, exp_name, ph_name,
-        args.T1, args.T2, args.thres0, args.thres1,
-        args.nums, args.method, args.norm, args.infval, args.time, args.weight
+        args.T1, args.T2, Tmax, args.thres0, args.thres1,
+        args.nums, args.method, args.norm, args.infval, args.time, sp, dp, cb
     )
     log_filename = os.path.join(log_path, log_filename)
     logger = get_module_logger(__name__, log_filename)
@@ -234,6 +287,9 @@ if __name__ == '__main__':
         sp_mth = ker_methods[sp]
 
     kerX = defaultdict()
+
+    # scale-variant type
+    kX0, kX1 = None, None
 
     for mt in ker_methods:
         if len(sp_mth) > 0 and mt != sp_mth:
@@ -253,35 +309,20 @@ if __name__ == '__main__':
                 kerX[mt] = fetX
                 print('Features loaded')
         elif mt == FET_SCALE or mt == FET_AVG_SCALE or mt == FET_AVG_SCALE_NORM:
-            kprm0 = KernelParams(args.method, args.T1, args.T2, args.thres0, args.infval, args.time)
-            kprm1 = KernelParams(args.method, args.T1, args.T2, args.thres1, args.infval, args.time)
-
-            # scale-variant type
-            kX0, kX1 = None, None
+            kprm0 = KernelParams(args.method, args.T1, args.T2, args.thres0, args.infval, args.time, Tmax)
+            kprm1 = KernelParams(args.method, args.T1, args.T2, args.thres1, args.infval, args.time, Tmax)
 
             kX0 = load_kernel('kernel', mt, exp_path, ph_name, dp, 0, kprm0, norm)
             kX1 = load_kernel('kernel', mt, exp_path, ph_name, dp, 1, kprm1, norm)
+            kX = None
+            if cb == 1:
+                kX = multiply_kernel(kX0, kX1)
+            else:
+                kX = add_kernel(kX0, kX1)
 
-            X_index, y = load_data(setting_file)
-            kX = kX0
-            if kX1 is not None:
-                if kX is not None:
-                    kX = weight*kX + (1.0-weight)*kX1
-                    #kX = np.multiply(kX, kX1)
-                    #kX = kX + kX1
-                    print('Combined kernel')
-                else:
-                    kX = kX1
             if kX is not None:
-                ## load vertex hist kernel
-                # vkerhist = np.loadtxt(os.path.join(exp_path, 'kernel\{}_vertexhist.txt'.format(data_name)), dtype=np.float32)
-                # vkerhist = normalize_kernel(vkerhist)
-                # ekerhist = np.loadtxt(os.path.join(exp_path, 'kernel\{}_edgehist.txt'.format(data_name)), dtype=np.float32)
-                
-                # kX = np.multiply(kX, vkerhist)
-
                 kerX[mt] = kX
-                print('Scale kernel loaded mt={}'.format(mt))
+                print('Scale kernel loaded mt={}, combine={}'.format(mt, cb))
                 print('Shape = ', kX.shape)
         elif mt in ker_pal:
             # load graph kernel
@@ -305,6 +346,8 @@ if __name__ == '__main__':
         for mt in kerX.keys():
             local_test, local_train = [], []
             for train_index, test_index in skf.split(X_index, y):
+                if cb != 0 and cb != 1:
+                    kerX[mt] = multiple_kernel_learning(y, train_index, kX0, kX1, label="learning combine kernels")
                 train_sc, test_sc = svc_classify(kerX[mt], y, train_index, test_index, mt)
                 local_train.append(train_sc)
                 local_test.append(test_sc)

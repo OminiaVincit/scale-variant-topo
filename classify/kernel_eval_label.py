@@ -68,8 +68,14 @@ FET_WL_SH = 'WL-ShortestPath'
 FET_WL_SB = 'WL-Subtree'
 FET_WL_VH = 'WL-VertexHist'
 FET_VH    = 'VertexHist'
+FET_PROP_ATTR = 'PropagationAttr'
+FET_GEOM  = 'GeometricRandomWalk'
+FET_EXP   = 'ExponentialRandomWalk'
+FET_THETA = 'SvmTheta'
+FET_HB_LB = 'Hilbert_label_p1_2_p2_2'
 
-ker_methods = [FET_SCALE, FET_SUB_SCALE, FET_GRAPHLET, FET_SHORTEST, FET_WL_SB, FET_WL_SH, FET_WL_VH, FET_VH]
+ker_methods = [FET_SCALE, FET_SUB_SCALE, FET_GRAPHLET, FET_SHORTEST, FET_WL_SB, FET_WL_SH, FET_WL_VH, FET_VH, FET_PROP_ATTR,\
+    FET_GEOM, FET_EXP, FET_THETA, FET_HB_LB]
 
 def get_exp_path(parent_path, data_name, exp_name):
     exp_path = r'{}/{}/{}'.format(parent_path, exp_name, data_name)
@@ -164,8 +170,9 @@ def load_data(filename):
     lbs = []
     datls = []
     
-    with open(filename, 'r') as rf:
+    with open(filename, 'r', encoding='utf-8') as rf:
         lines = rf.readlines()
+        print(len(lines))
         for line in lines:
             lb = int(re.search('lb_([0-9]+)_', line).groups()[0])
             lbs.append(lb)
@@ -174,7 +181,7 @@ def load_data(filename):
 
     X_index = np.array(datls).astype(np.int32)
     y = np.array(lbs).astype(np.int32)
-
+    print('Loaded setting file, shape ', X_index.shape, y.shape)
     return X_index, y
 
 def svc_classify(X, y, train_index, test_index, mt, opt_C=None):
@@ -211,6 +218,13 @@ def add_kernel(K1, K2):
     if K2 is None:
         return K1
     return (K1 + K2)
+
+def multiply_kernel(K1, K2):
+    if K1 is None:
+        return K2
+    if K2 is None:
+        return K1
+    return np.multiply(K1, K2)
 
 def combine_kernel(K1, K2, alpha):
     if K1 is None:
@@ -304,6 +318,7 @@ if __name__ == '__main__':
     parser.add_argument('--infval', type=float, default=0.0)
     parser.add_argument('--norm', type=int, default=1)
     parser.add_argument('--nums', '-nu', type=int, default=1)
+    parser.add_argument('--combine', '-cb', type=int, default=-1) # 0: add, 1: multiply, other: multiple learning
     parser.add_argument('--sp', type=int, default=0) # specific index of kernel method, -1 for test all methods
     parser.add_argument('--sb', type=int, default=-1) # sepecific index of subkernel
     parser.add_argument('--dp', type=int, default=-1) # specific dim for calculating kernel, -1 for use all dimensions
@@ -314,7 +329,8 @@ if __name__ == '__main__':
     parent_path, data_name, exp_name, ph_name = args.parentpath, args.dataname, args.expname, args.phname
     sph_name, sdp = args.sphname, args.sdp
     dp, sp, sb, norm, infval, weight = args.dp, args.sp, args.sb, args.norm, args.infval, args.weight
-    
+    combine = args.combine
+
     dir_path = os.path.dirname(os.path.realpath(__file__))
     log_path = os.path.join(dir_path, args.log)
     exp_path = get_exp_path(parent_path, data_name, exp_name)
@@ -322,10 +338,10 @@ if __name__ == '__main__':
     if os.path.exists(log_path) == False:
         os.makedirs(log_path)
 
-    log_filename = '{}_{}_{}_T1_{}_T2_{}_thres0_{}_thres1_{}_nums_{}_method_{}_norm_{}_infval_{}_t_{}_w_{}.log'.format(
+    log_filename = '{}_{}_{}_T1_{}_T2_{}_thres0_{}_thres1_{}_nums_{}_method_{}_norm_{}_infval_{}_t_{}_sp_{}_sub_{}_comb_{}.log'.format(
         data_name, exp_name, ph_name,
         args.T1, args.T2, args.thres0, args.thres1,
-        args.nums, args.method, args.norm, args.infval, args.time, args.weight
+        args.nums, args.method, args.norm, args.infval, args.time, sp, sb, combine
     )
     log_filename = os.path.join(log_path, log_filename)
     logger = get_module_logger(__name__, log_filename)
@@ -371,7 +387,7 @@ if __name__ == '__main__':
             else:
                 skX = load_graph_kernel(data_name, exp_path, sb_mth, norm)
             if skX is not None:
-                print('Sub scale kernel loaded mt={} with shape'.format(mt), skX.shape)
+                print('Sub kernel loaded mt={} with shape'.format(sb_mth), skX.shape)
                 kX  = add_kernel(kX, skX)
                 #kX = np.multiply(kX, kX) + np.multiply(skX, skX)
             if kX is not None:
@@ -401,7 +417,14 @@ if __name__ == '__main__':
                     kX = multiple_kernel_learning(y, train_index, kX0, kX1, label="learning main kernels")
                     if sb_mth == FET_SUB_SCALE:
                         skX = multiple_kernel_learning(y, train_index, skX0, skX1, label="learning sub kernels")
-                    kerX[mt] = multiple_kernel_learning(y, train_index, kX, skX, label="learning combine kernels")
+                    if combine == 0:
+                        #print('Add kernel')
+                        kerX[mt] = add_kernel(kX, skX)
+                    elif combine == 1:
+                        #print('Multiply kernel')
+                        kerX[mt] = multiply_kernel(kX, skX)
+                    else:
+                        kerX[mt] = multiple_kernel_learning(y, train_index, kX, skX, label="learning combine kernels")
                     #kerX[mt] = normalize_kernel(kerX[mt])
                     #model = multiple_kernel_learning(y, train_index, kX0, kX1, skX0, skX1)
                 
