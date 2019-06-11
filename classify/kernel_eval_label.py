@@ -73,9 +73,12 @@ FET_GEOM  = 'GeometricRandomWalk'
 FET_EXP   = 'ExponentialRandomWalk'
 FET_THETA = 'SvmTheta'
 FET_HB_LB = 'Hilbert_label_p1_2_p2_2'
+FET_HB_ATT = 'Hilbert_attr_p1_2_p2_2'
+FET_HB_LB_ATT = 'Hilbert_label_attr_p1_2_p2_2'
+
 
 ker_methods = [FET_SCALE, FET_SUB_SCALE, FET_GRAPHLET, FET_SHORTEST, FET_WL_SB, FET_WL_SH, FET_WL_VH, FET_VH, FET_PROP_ATTR,\
-    FET_GEOM, FET_EXP, FET_THETA, FET_HB_LB]
+    FET_GEOM, FET_EXP, FET_THETA, FET_HB_LB, FET_HB_ATT, FET_HB_LB_ATT]
 
 def get_exp_path(parent_path, data_name, exp_name):
     exp_path = r'{}/{}/{}'.format(parent_path, exp_name, data_name)
