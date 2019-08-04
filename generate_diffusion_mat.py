@@ -101,7 +101,9 @@ def tda_net(netfile, out_path, tauls, normflag, avgflag):
     basename = basename.replace('_adj.nse', '')
     basename = basename.replace('.nse', '')
     distpath = os.path.join(out_path, basename)
-
+    if os.path.exists(distpath + '.npy'):
+        print('Already existed : {}'.format(distpath))
+        return None
     G = read_network(netfile)
     A = nx.to_scipy_sparse_matrix(G)
     A = A.todense()
