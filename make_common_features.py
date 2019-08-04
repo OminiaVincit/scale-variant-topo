@@ -157,8 +157,8 @@ def network_statistics(G):
     global_efficiency = nx.global_efficiency(G)
     nums_connected = nx.number_connected_components(G)
     md = get_modularity(G)
-    egm = get_EGMFPT(G)
-    #egm = 0.0
+    #egm = get_EGMFPT(G)
+    egm = 0.0
     features = [egm, md, ass_coef, avg_cc, avg_deg_centrality, avg_shortest, avg_eccentricity, avg_node_closeness_centrality, 
                 avg_node_betweeness_centrality, avg_edge_betweeness_centrality, avg_local_efficiency, avg_triangles,
                 density, transitivity, diameter, radius, global_efficiency, nums_connected]

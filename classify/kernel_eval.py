@@ -296,7 +296,7 @@ if __name__ == '__main__':
             continue
         if mt == FET_COMMON:
             # features type
-            feature_file = os.path.join(exp_path, 'kernel/common_features.npy')
+            feature_file = os.path.join(exp_path, 'kernel/common_features_rev.npy')
             if os.path.isfile(feature_file):
                 fetX = np.load(feature_file)
                 fetX[np.isnan(fetX)] = 0.0
