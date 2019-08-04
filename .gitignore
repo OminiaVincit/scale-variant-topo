@@ -48,3 +48,5 @@ graph-kernels/.RData
 graph-kernels/.Rhistory
 *.bak
 *.pyc
+*.suo
+*.suo

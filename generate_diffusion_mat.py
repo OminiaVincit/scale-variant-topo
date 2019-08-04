@@ -35,8 +35,10 @@ def read_network(netfile):
         # read network from matlab format file
         adjmat = sio.loadmat(netfile)['A']
         G = nx.from_numpy_matrix(adjmat)
-    else:
+    elif 'dk' in netfile:
         G = nx.read_edgelist(netfile, delimiter='\t', comments='#', data=(('weight', float),))
+    else:
+        G = nx.read_edgelist(netfile, delimiter=' ', comments='#', data=(('weight', float),))
     return G
 
 def eig_decompose_mat(A):
@@ -100,6 +102,7 @@ def tda_net(netfile, out_path, tauls, normflag, avgflag):
     basename = os.path.basename(netfile).replace('_adj.mat', '')
     basename = basename.replace('_adj.nse', '')
     basename = basename.replace('.nse', '')
+    basename = basename.replace('.txt', '')
     distpath = os.path.join(out_path, basename)
     if os.path.exists(distpath + '.npy'):
         print('Already existed : {}'.format(distpath))
@@ -151,6 +154,9 @@ def get_file_list_process(mat_path, idxls):
                 netfile_ls.append(netfile)
         for netfile in glob.glob(r'{}/nodes_*_index_{}_adj.nse'.format(mat_path, idx)):
                 # for LFR, LFR-H networks
+                netfile_ls.append(netfile)
+        for netfile in glob.glob(r'{}/*nodes_*_index_{}.txt'.format(mat_path, idx)):
+                # for BA networks
                 netfile_ls.append(netfile)
     return netfile_ls
 
