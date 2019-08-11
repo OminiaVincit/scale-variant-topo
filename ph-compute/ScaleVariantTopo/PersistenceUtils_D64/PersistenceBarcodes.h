@@ -34,10 +34,11 @@ namespace NPersistenceUtils {
     template <typename Dtype>
     struct PersistenceUtils_D64_API SKerParam {
         SKerParam() {};
-        SKerParam(Dtype _singletau, Dtype _maxtau) :
-            single_tau(_singletau), max_tau(_maxtau) {};
+        SKerParam(Dtype _singletau, Dtype _maxtau, Dtype _interval) :
+            single_tau(_singletau), max_tau(_maxtau), interval(_interval) {};
         Dtype single_tau = 0;
         Dtype max_tau = 0;
+		Dtype interval = 1;
     };
 
     template <typename Dtype>

@@ -378,6 +378,8 @@ int main(int argc, char** argv)
         ("single_tau", value<double>()->default_value(-1.0), "Specify for single tau, < 0: take all tau")
         ("max_tau", value<double>()->default_value(0.0), 
             "Maximum of scale when calculating kernel, max_tau = 0 means that taking all possible tau")
+		("interval", value<double>()->default_value(1.0),
+				"Interval to skip tau when calculating kernel with all taus")
         ("kfdr", value<bool>()->default_value(false), "option to calculate kfdr, 1: kfdr, 0:kernel")
         ("kfdrout", value<std::string>()->default_value("kfdr"), "Output folder for kfdr")
         ("nbegin", value<unsigned>()->default_value(0))
@@ -402,6 +404,8 @@ int main(int argc, char** argv)
     auto dim = vm["dim"].as<unsigned>();
     auto single_tau = vm["single_tau"].as<double>();
     auto max_tau = static_cast<FType>(vm["max_tau"].as<double>());
+	auto interval = static_cast<FType>(vm["interval"].as<double>());
+	if (interval <= 0.0) interval = 1.0;
 
     bool skip = true;
     auto infval = static_cast<FType>(vm["infval"].as<double>());
@@ -445,12 +449,12 @@ int main(int argc, char** argv)
     KernelPrm<FType> prm;
     prm.kertype = kertype;
     prm.T1 = T1;
-    prm.T2 = T2;
+    prm.T2 = T2 * interval * interval;
     prm.postfix = posfix + L"_T1_" + std::to_wstring(T1) +
         L"_T2_" + std::to_wstring(T2);
 
     const SHoleParam<FType> rprms(dim, infval, skip, threshold);
-    const SKerParam<FType> kpm(single_tau, max_tau);
+    const SKerParam<FType> kpm(single_tau, max_tau, interval);
 
     auto kfdr = vm["kfdr"].as<bool>();
     if (kfdr == TRUE) {

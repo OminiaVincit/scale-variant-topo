@@ -29,6 +29,7 @@ namespace NPersistenceUtils {
 
         auto single_tau = kprms.single_tau;
         auto max_tau    = kprms.max_tau;
+		auto interval = kprms.interval;
 
         //std::cout << "Filename = " << NStringUtil::_w2s(filename) << std::endl;
         std::wifstream read_op;
@@ -66,7 +67,8 @@ namespace NPersistenceUtils {
                         break;
                     if (single_tau >= 0 && single_tau != tau)
                         continue;
-
+					if (interval >= 2.0 && tau > 1.0 && ((int)(tau) % (int)(interval) != 0))
+						continue;
                     if (skipInfty && death == std::numeric_limits<Dtype>::infinity()) {
                         continue;
                     }
@@ -90,7 +92,7 @@ namespace NPersistenceUtils {
     template <typename Dtype>
     CPersistenceBarcodes<Dtype>::CPersistenceBarcodes(const std::wstring filename,
         const SHoleParam<Dtype> rprms) {
-        const SKerParam<Dtype> kprms(-1.0, 0.0);
+        const SKerParam<Dtype> kprms(-1.0, 0.0, 1.0);
         CPersistenceBarcodes<Dtype>(filename, rprms, kprms);
     }
 
