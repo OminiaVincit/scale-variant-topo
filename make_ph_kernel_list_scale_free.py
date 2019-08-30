@@ -16,7 +16,7 @@ if __name__ == '__main__':
     dks = ['BA', 'conf']
 
     for dim in [0, 1]:
-        outfile = r'{}\barlist_d_{}.txt'.format(parent, dim)
+        outfile = r'{}\barlist_scalefree_d_{}.txt'.format(parent, dim)
         filels = []
         for dk in dks:
             infolder = os.path.join(parent, 'ph_{}_{}'.format(args.data, dk))
