@@ -200,7 +200,7 @@ int main(int argc, char** argv)
             FType maxdist = dat[n*N];
             for (size_t i = 0; i < Nr; ++i) {
                 for (size_t j = 0; j < i; ++j) {
-                    const FType tmp = dat[n*N + i*Nr + j];
+                    const FType tmp = dat[n*N + i*Nc + j];
                     if (tmp > maxdist) maxdist = tmp;
                 }
             }
@@ -209,7 +209,7 @@ int main(int argc, char** argv)
 			std::vector<value_t> distvec;
 			for (size_t i = 0; i < Nr; ++i)
                 for (size_t j = 0; j < i; ++j) {
-                    FType tmp = dat[n*N + i*Nr + j];
+                    FType tmp = dat[n*N + i*Nc + j];
                     if (norm > 0) tmp = tmp / maxdist;
                     distvec.push_back(tmp);
                 }
